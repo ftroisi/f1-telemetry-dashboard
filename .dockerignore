@@ -1,0 +1,11 @@
+.git
+node_modules
+.gitignore
+*.md
+!README.md
+LICENSE
+requirements.md
+.env
+.env.example
+dist
+*.log

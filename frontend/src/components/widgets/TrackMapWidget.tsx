@@ -1,0 +1,110 @@
+import React, { useState, useEffect } from 'react';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { getLocationData } from '../../api/client';
+import { Loader2, AlertCircle } from 'lucide-react';
+
+interface TrackMapWidgetProps {
+  sessionKey: number;
+  driverNumbers: number[];
+  configurable?: boolean;
+  onConfigure?: () => void;
+}
+
+export default function TrackMapWidget({ sessionKey, driverNumbers }: TrackMapWidgetProps) {
+  const [scatterData, setScatterData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const colors = ['#1ca7e3', '#f70814', '#27c93f', '#fbce04', '#dd2295', '#ffffff', '#ff8800', '#aa66ff'];
+
+  useEffect(() => {
+    async function fetchData() {
+      if (driverNumbers.length === 0) {
+        setScatterData([]);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const allData = await Promise.all(
+          driverNumbers.map(async (dn, idx) => {
+            const locs = await getLocationData(sessionKey, dn);
+            return {
+              driverNumber: dn,
+              color: colors[idx % colors.length],
+              data: locs.map((l: any) => ({ x: l.x, y: l.y })),
+            };
+          })
+        );
+        
+        // Recharts ScatterChart needs data in a specific format
+        const series = allData.filter(s => s.data.length > 0).map(s => ({
+          name: `Driver #${s.driverNumber}`,
+          color: s.color,
+          data: s.data,
+        }));
+        
+        setScatterData(series);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load location data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [sessionKey, driverNumbers]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-6 h-6 text-racing-red-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <AlertCircle className="w-6 h-6 text-red-400 mx-auto mb-2" />
+          <p className="text-red-300 text-xs">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (scatterData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500 text-sm">No track position data available</p>
+      </div>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <ScatterChart margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+        <XAxis dataKey="x" type="number" tick={{ fill: '#999', fontSize: 10 }} stroke="#555" />
+        <YAxis dataKey="y" type="number" tick={{ fill: '#999', fontSize: 10 }} stroke="#555" />
+        <Tooltip
+          contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #333', borderRadius: '8px' }}
+          labelStyle={{ color: '#fff' }}
+        />
+        <Legend wrapperStyle={{ fontSize: '11px' }} />
+        {scatterData.map((series) => (
+          <Scatter
+            key={series.name}
+            name={series.name}
+            data={series.data}
+            fill={series.color}
+            line={{ stroke: series.color, strokeWidth: 1.5 }}
+            lineType="joint"
+            shape="circle"
+          />
+        ))}
+      </ScatterChart>
+    </ResponsiveContainer>
+  );
+}
