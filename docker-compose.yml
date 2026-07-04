@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine3.23
     container_name: f1-db
     restart: unless-stopped
     environment:

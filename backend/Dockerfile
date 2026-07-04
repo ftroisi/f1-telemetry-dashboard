@@ -1,24 +1,26 @@
 # ---- Build Stage ----
-FROM node:20-alpine AS builder
+FROM node:26-alpine3.23 AS builder
 
 WORKDIR /app
 
-COPY backend/package.json backend/package-lock.json ./
+COPY backend/package.json ./
+COPY backend/pnpm-lock.yaml ./
 COPY backend/tsconfig.json ./
-RUN npm ci
+RUN pnpm install
 
 COPY backend/src/ ./src/
 COPY db/ ./db/
 
-RUN npm run build
+RUN pnpm run build
 
 # ---- Production Stage ----
-FROM node:20-alpine AS production
+FROM node:26-alpine3.23 AS production
 
 WORKDIR /app
 
-COPY backend/package.json backend/package-lock.json ./
-RUN npm ci --omit=dev
+COPY backend/package.json ./
+COPY backend/pnpm-lock.yaml ./
+RUN pnpm install --prod
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/db ./db

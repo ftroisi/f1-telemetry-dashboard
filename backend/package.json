@@ -2,6 +2,11 @@
   "name": "f1-telemetry-backend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=26",
+    "pnpm": ">=11"
+  },
+  "packageManager": "pnpm@11.10.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -9,20 +14,20 @@
     "migrate": "tsx src/db/migrate.ts"
   },
   "dependencies": {
-    "express": "^4.21.0",
-    "pg": "^8.13.0",
-    "protobufjs": "^7.4.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "uuid": "^10.0.0"
+    "express": "^5.2.1",
+    "pg": "^8.22.0",
+    "protobufjs": "^8.6.6",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.5.0",
-    "@types/pg": "^8.11.10",
-    "@types/cors": "^2.8.17",
-    "@types/uuid": "^10.0.0",
-    "typescript": "^5.5.4",
-    "tsx": "^4.19.0"
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.0",
+    "@types/pg": "^8.20.0",
+    "@types/cors": "^2.8.19",
+    "@types/uuid": "^11.0.0",
+    "typescript": "^6.0.3",
+    "tsx": "^4.23.0"
   }
 }
