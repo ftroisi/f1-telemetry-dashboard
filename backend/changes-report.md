@@ -142,3 +142,59 @@ M  frontend/src/components/widgets/RacePositionsWidget.tsx # formatter type fix
 D  frontend/tailwind.config.js                     # removed (v4 CSS-first)
 A  frontend/src/vite-env.d.ts                      # CSS module declarations
 ```
+
+---
+
+## 9. 🐌 Rate Limiter — 429 Retry with Exponential Backoff
+
+### Issue
+`openf1Client.ts` had a naive token-bucket rate limiter that **did not handle 429 responses**. When the OpenF1 API returned "Rate limit exceeded", the error propagated immediately to the user with no retry, failing the entire import.
+
+### Fix — `backend/src/services/openf1Client.ts`
+Replaced the basic token-bucket with a **queue-based rate limiter + retry logic**:
+
+1. **Token-bucket refill** — tracks per-second (3 tokens) and per-minute (30 tokens) limits
+2. **Queue processing** — requests wait in a FIFO queue until tokens are available
+3. **429 retry with exponential backoff** — on HTTP 429, the request is re-queued with `retries++` and a delay of `1000ms × 2^retry` (1s, 2s, 4s, 8s, 16s). Up to **5 retries** per request.
+4. **Token refund** — if a 429 is received, the consumed token is returned to the bucket
+5. **Network error retry** — same exponential backoff for transient network failures
+
+---
+
+## 10. 🔔 Frontend Error Display — react-toastify
+
+### Changes
+- **`frontend/package.json`** — added `react-toastify@^11.1.0`
+- **`frontend/src/App.tsx`** — added `<ToastContainer>` with dark theme at the root level
+- **`frontend/src/pages/Onboarding.tsx`** — replaced inline error banner with `toast.error()` calls for:
+  - Failed meeting/session fetch
+  - Failed import start
+  - Import failure (polled from `/import/status`)
+  - Successful import completion via `toast.success()`
+
+---
+
+## 11. 🎛️ Onboarding UI — MUI Selects + Autocomplete
+
+### Changes — `frontend/src/pages/Onboarding.tsx`
+Replaced the hand-styled `<button>` lists with Material UI components:
+
+| Element | Before | After |
+|---------|--------|-------|
+| Year picker | Custom `<button>` row | MUI `<Select>` with `MenuItem` |
+| Grand Prix picker | Custom `<button>` scrollable list | MUI `<Autocomplete>` with search/filter |
+| Session picker | Custom `<button>` scrollable list | MUI `<Select>` with session type icons |
+| Import button | Custom `<button>` | MUI `<Button>` (contained, racing-red) |
+| Browse button | Custom `<button>` | MUI `<Button>` (outlined) |
+| Progress display | Custom progress bar + icons | MUI `<LinearProgress>` + Typography |
+
+All elements are **centered** with proper spacing via `Box sx={{ display: "flex", justifyContent: "center" }}` and a **dark F1 theme** applied via `<ThemeProvider>`.
+
+### Dependencies added
+```
+@mui/material@^9.2.0
+@mui/icons-material@^9.2.0
+@emotion/react@^11.14.0
+@emotion/styled@^11.14.1
+react-toastify@^11.1.0
+```

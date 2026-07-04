@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { checkHealth } from "./api/client";
 
 function App() {
@@ -57,17 +60,28 @@ function App() {
     );
   }
 
-  if (!hasData || !sessionKey) {
-    return (
-      <Onboarding
-        onImportComplete={handleImportComplete}
-        onSelectSession={handleSelectSession}
-        existingSessionKey={sessionKey}
+  return (
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="dark"
       />
-    );
-  }
-
-  return <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />;
+      {!hasData || !sessionKey ? (
+        <Onboarding
+          onImportComplete={handleImportComplete}
+          onSelectSession={handleSelectSession}
+          existingSessionKey={sessionKey}
+        />
+      ) : (
+        <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
+      )}
+    </>
+  );
 }
 
 export default App;
