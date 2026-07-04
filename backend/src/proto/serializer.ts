@@ -1,5 +1,5 @@
 // Protobuf-based serializer for efficient API communication
-import * as protobuf from 'protobufjs';
+import * as protobuf from "protobufjs";
 
 // In-memory protobuf schema definition
 const protoDefinition = `
@@ -143,15 +143,15 @@ let HealthResponseMsg: protobuf.Type;
 
 export function initProto() {
   root = protobuf.parse(protoDefinition).root;
-  MeetingsResponse = root.lookupType('f1telemetry.MeetingsResponse');
-  SessionsResponse = root.lookupType('f1telemetry.SessionsResponse');
-  DriversResponse = root.lookupType('f1telemetry.DriversResponse');
-  LapsResponse = root.lookupType('f1telemetry.LapsResponse');
-  CarDataResponse = root.lookupType('f1telemetry.CarDataResponse');
-  PositionsResponse = root.lookupType('f1telemetry.PositionsResponse');
-  PitResponse = root.lookupType('f1telemetry.PitResponse');
-  ImportStatusMsg = root.lookupType('f1telemetry.ImportStatus');
-  HealthResponseMsg = root.lookupType('f1telemetry.HealthResponse');
+  MeetingsResponse = root.lookupType("f1telemetry.MeetingsResponse");
+  SessionsResponse = root.lookupType("f1telemetry.SessionsResponse");
+  DriversResponse = root.lookupType("f1telemetry.DriversResponse");
+  LapsResponse = root.lookupType("f1telemetry.LapsResponse");
+  CarDataResponse = root.lookupType("f1telemetry.CarDataResponse");
+  PositionsResponse = root.lookupType("f1telemetry.PositionsResponse");
+  PitResponse = root.lookupType("f1telemetry.PitResponse");
+  ImportStatusMsg = root.lookupType("f1telemetry.ImportStatus");
+  HealthResponseMsg = root.lookupType("f1telemetry.HealthResponse");
 }
 
 function wrapArray(items: any[], wrapper: any, field: string): Uint8Array {
@@ -162,31 +162,31 @@ function wrapArray(items: any[], wrapper: any, field: string): Uint8Array {
 }
 
 export function serializeMeetings(meetings: any[]): Uint8Array {
-  return wrapArray(meetings, MeetingsResponse, 'meetings');
+  return wrapArray(meetings, MeetingsResponse, "meetings");
 }
 
 export function serializeSessions(sessions: any[]): Uint8Array {
-  return wrapArray(sessions, SessionsResponse, 'sessions');
+  return wrapArray(sessions, SessionsResponse, "sessions");
 }
 
 export function serializeDrivers(drivers: any[]): Uint8Array {
-  return wrapArray(drivers, DriversResponse, 'drivers');
+  return wrapArray(drivers, DriversResponse, "drivers");
 }
 
 export function serializeLaps(laps: any[]): Uint8Array {
-  return wrapArray(laps, LapsResponse, 'laps');
+  return wrapArray(laps, LapsResponse, "laps");
 }
 
 export function serializeCarData(carData: any[]): Uint8Array {
-  return wrapArray(carData, CarDataResponse, 'car_data');
+  return wrapArray(carData, CarDataResponse, "car_data");
 }
 
 export function serializePositions(positions: any[]): Uint8Array {
-  return wrapArray(positions, PositionsResponse, 'positions');
+  return wrapArray(positions, PositionsResponse, "positions");
 }
 
 export function serializePit(pitStops: any[]): Uint8Array {
-  return wrapArray(pitStops, PitResponse, 'pit_stops');
+  return wrapArray(pitStops, PitResponse, "pit_stops");
 }
 
 export function serializeImportStatus(status: any): Uint8Array {
@@ -194,7 +194,10 @@ export function serializeImportStatus(status: any): Uint8Array {
   return ImportStatusMsg.encode(msg).finish();
 }
 
-export function serializeHealth(health: { has_data: boolean; session_count: number }): Uint8Array {
+export function serializeHealth(health: {
+  has_data: boolean;
+  session_count: number;
+}): Uint8Array {
   const msg = HealthResponseMsg.create(health);
   return HealthResponseMsg.encode(msg).finish();
 }
@@ -204,30 +207,43 @@ export function serializeJson(data: any): string {
 }
 
 // Supported serialization formats
-export type SerializationFormat = 'json' | 'protobuf';
+export type SerializationFormat = "json" | "protobuf";
 
 export function getFormat(req: any): SerializationFormat {
-  const accept = req.headers?.accept || '';
-  if (accept.includes('application/x-protobuf') || accept.includes('application/protobuf')) {
-    return 'protobuf';
+  const accept = req.headers?.accept || "";
+  if (
+    accept.includes("application/x-protobuf") ||
+    accept.includes("application/protobuf")
+  ) {
+    return "protobuf";
   }
-  return 'json';
+  return "json";
 }
 
-export function sendResponse(res: any, data: any, format: SerializationFormat, serializer: (data: any) => Uint8Array) {
-  if (format === 'protobuf') {
+export function sendResponse(
+  res: any,
+  data: any,
+  format: SerializationFormat,
+  serializer: (data: any) => Uint8Array,
+) {
+  if (format === "protobuf") {
     const buf = serializer(data);
-    res.set('Content-Type', 'application/x-protobuf');
+    res.set("Content-Type", "application/x-protobuf");
     res.send(Buffer.from(buf));
   } else {
     res.json(data);
   }
 }
 
-export function sendScalarResponse(res: any, data: any, format: SerializationFormat, serializer: (data: any) => Uint8Array) {
-  if (format === 'protobuf') {
+export function sendScalarResponse(
+  res: any,
+  data: any,
+  format: SerializationFormat,
+  serializer: (data: any) => Uint8Array,
+) {
+  if (format === "protobuf") {
     const buf = serializer(data);
-    res.set('Content-Type', 'application/x-protobuf');
+    res.set("Content-Type", "application/x-protobuf");
     res.send(Buffer.from(buf));
   } else {
     res.json(data);

@@ -1,20 +1,20 @@
-import { Pool } from 'pg';
-import type { PoolConfig } from 'pg';
+import { Pool } from "pg";
+import type { PoolConfig } from "pg";
 
 const poolConfig: PoolConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_NAME || 'f1_telemetry',
-  user: process.env.DB_USER || 'f1user',
-  password: process.env.DB_PASSWORD || 'f1password',
+  host: process.env.DB_HOST || "localhost",
+  port: parseInt(process.env.DB_PORT || "5432", 10),
+  database: process.env.DB_NAME || "f1_telemetry",
+  user: process.env.DB_USER || "f1user",
+  password: process.env.DB_PASSWORD || "f1password",
   max: 10,
   idleTimeoutMillis: 30000,
 };
 
 const pool = new Pool(poolConfig);
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
 });
 
 export async function query(text: string, params?: any[]) {

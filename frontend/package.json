@@ -9,8 +9,12 @@
   },
   "packageManager": "pnpm@11.10.0",
   "scripts": {
-    "dev": "vite",
     "build": "tsc -b && vite build",
+    "check:tsc": "tsc --noEmit",
+    "check:audit": "pnpm dlx audit-ci@^7 --config ./audit-ci.jsonc",
+    "check": "pnpm run check:tsc && pnpm run check:audit",
+    "dev": "vite",
+    "format": "pnpm exec prettier . --write",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -30,6 +34,8 @@
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.5.2",
     "postcss": "^8.5.16",
+    "prettier": "3.9.4",
+    "prettier-plugin-tailwindcss": "0.8.0",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vite": "^8.1.3"

@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = "/api";
 
 interface FetchOptions {
   method?: string;
@@ -9,30 +9,30 @@ interface FetchOptions {
 async function fetchApi(path: string, options: FetchOptions = {}) {
   const url = `${API_BASE}${path}`;
   const headers: Record<string, string> = {
-    ...options.headers,
+    ...options.headers
   };
-  
+
   if (options.body && !(options.body instanceof FormData)) {
-    headers['Content-Type'] = 'application/json';
+    headers["Content-Type"] = "application/json";
   }
-  
+
   const res = await fetch(url, {
-    method: options.method || 'GET',
+    method: options.method || "GET",
     headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: options.body ? JSON.stringify(options.body) : undefined
   });
-  
+
   if (!res.ok) {
     const error = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(error.message || `HTTP ${res.status}`);
   }
-  
-  const contentType = res.headers.get('content-type') || '';
-  if (contentType.includes('application/x-protobuf')) {
+
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/x-protobuf")) {
     // For protobuf, return the array buffer (will be decoded by specific functions if needed)
     return res.arrayBuffer();
   }
-  
+
   return res.json();
 }
 
@@ -117,7 +117,7 @@ export interface PitStop {
 }
 
 export interface ImportProgress {
-  status: 'pending' | 'running' | 'complete' | 'error' | 'idle';
+  status: "pending" | "running" | "complete" | "error" | "idle";
   stage: string;
   progress: number;
   message: string;
@@ -125,11 +125,11 @@ export interface ImportProgress {
 }
 
 export async function checkHealth(): Promise<{ has_data: boolean; session_count: number }> {
-  return fetchApi('/health');
+  return fetchApi("/health");
 }
 
 export async function getMeetings(year?: number): Promise<Meeting[]> {
-  const params = year ? `?year=${year}` : '';
+  const params = year ? `?year=${year}` : "";
   return fetchApi(`/meetings${params}`);
 }
 
@@ -142,7 +142,7 @@ export async function getDrivers(sessionKey: number): Promise<Driver[]> {
 }
 
 export async function getLaps(sessionKey: number, driverNumber?: number): Promise<Lap[]> {
-  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : '';
+  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
   return fetchApi(`/sessions/${sessionKey}/laps${params}`);
 }
 
@@ -153,36 +153,39 @@ export async function getCarData(
   maxDate?: string
 ): Promise<CarDataPoint[]> {
   const params = new URLSearchParams();
-  if (driverNumber !== undefined) params.set('driver_number', String(driverNumber));
-  if (minDate) params.set('min_date', minDate);
-  if (maxDate) params.set('max_date', maxDate);
+  if (driverNumber !== undefined) params.set("driver_number", String(driverNumber));
+  if (minDate) params.set("min_date", minDate);
+  if (maxDate) params.set("max_date", maxDate);
   const qs = params.toString();
-  return fetchApi(`/sessions/${sessionKey}/car-data${qs ? `?${qs}` : ''}`);
+  return fetchApi(`/sessions/${sessionKey}/car-data${qs ? `?${qs}` : ""}`);
 }
 
 export async function getPositions(sessionKey: number, driverNumber?: number): Promise<Position[]> {
-  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : '';
+  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
   return fetchApi(`/sessions/${sessionKey}/positions${params}`);
 }
 
 export async function getPitData(sessionKey: number, driverNumber?: number): Promise<PitStop[]> {
-  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : '';
+  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
   return fetchApi(`/sessions/${sessionKey}/pit${params}`);
 }
 
 export async function getLocationData(sessionKey: number, driverNumber?: number): Promise<any[]> {
-  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : '';
+  const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
   return fetchApi(`/sessions/${sessionKey}/location${params}`);
 }
 
-export async function triggerImport(sessionKey: number, meetingKey: number): Promise<{ import_id: number; status: string }> {
-  return fetchApi('/import', {
-    method: 'POST',
-    body: { session_key: sessionKey, meeting_key: meetingKey },
+export async function triggerImport(
+  sessionKey: number,
+  meetingKey: number
+): Promise<{ import_id: number; status: string }> {
+  return fetchApi("/import", {
+    method: "POST",
+    body: { session_key: sessionKey, meeting_key: meetingKey }
   });
 }
 
 export async function getImportStatus(sessionKey?: number): Promise<ImportProgress> {
-  const params = sessionKey ? `?session_key=${sessionKey}` : '';
+  const params = sessionKey ? `?session_key=${sessionKey}` : "";
   return fetchApi(`/import/status${params}`);
 }

@@ -1,13 +1,15 @@
-import { query } from './connection';
+import { query } from "./connection";
 
 // --- Meetings ---
 export async function getMeetings() {
-  const res = await query('SELECT * FROM meetings ORDER BY date_start DESC');
+  const res = await query("SELECT * FROM meetings ORDER BY date_start DESC");
   return res.rows;
 }
 
 export async function getMeetingByKey(meetingKey: number) {
-  const res = await query('SELECT * FROM meetings WHERE meeting_key = $1', [meetingKey]);
+  const res = await query("SELECT * FROM meetings WHERE meeting_key = $1", [
+    meetingKey,
+  ]);
   return res.rows[0] || null;
 }
 
@@ -26,20 +28,31 @@ export async function upsertMeeting(meeting: any) {
       location = EXCLUDED.location
   `;
   await query(sql, [
-    meeting.meeting_key, meeting.year, meeting.country_name,
-    meeting.circuit_short_name, meeting.date_start, meeting.date_end,
-    meeting.meeting_name, meeting.meeting_official_name, meeting.location
+    meeting.meeting_key,
+    meeting.year,
+    meeting.country_name,
+    meeting.circuit_short_name,
+    meeting.date_start,
+    meeting.date_end,
+    meeting.meeting_name,
+    meeting.meeting_official_name,
+    meeting.location,
   ]);
 }
 
 // --- Sessions ---
 export async function getSessionsByMeeting(meetingKey: number) {
-  const res = await query('SELECT * FROM sessions WHERE meeting_key = $1 ORDER BY date_start', [meetingKey]);
+  const res = await query(
+    "SELECT * FROM sessions WHERE meeting_key = $1 ORDER BY date_start",
+    [meetingKey],
+  );
   return res.rows;
 }
 
 export async function getSessionByKey(sessionKey: number) {
-  const res = await query('SELECT * FROM sessions WHERE session_key = $1', [sessionKey]);
+  const res = await query("SELECT * FROM sessions WHERE session_key = $1", [
+    sessionKey,
+  ]);
   return res.rows[0] || null;
 }
 
@@ -56,19 +69,27 @@ export async function upsertSession(session: any) {
       year = EXCLUDED.year
   `;
   await query(sql, [
-    session.session_key, session.meeting_key, session.session_name,
-    session.session_type, session.date_start, session.date_end, session.year
+    session.session_key,
+    session.meeting_key,
+    session.session_name,
+    session.session_type,
+    session.date_start,
+    session.date_end,
+    session.year,
   ]);
 }
 
 export async function getSessionCount() {
-  const res = await query('SELECT COUNT(*) as count FROM sessions');
+  const res = await query("SELECT COUNT(*) as count FROM sessions");
   return parseInt(res.rows[0].count, 10);
 }
 
 // --- Drivers ---
 export async function getDrivers(sessionKey: number) {
-  const res = await query('SELECT * FROM drivers WHERE session_key = $1 ORDER BY driver_number', [sessionKey]);
+  const res = await query(
+    "SELECT * FROM drivers WHERE session_key = $1 ORDER BY driver_number",
+    [sessionKey],
+  );
   return res.rows;
 }
 
@@ -85,21 +106,26 @@ export async function upsertDriver(driver: any) {
       country_code = EXCLUDED.country_code
   `;
   await query(sql, [
-    driver.session_key, driver.driver_number, driver.full_name,
-    driver.name_acronym, driver.team_name, driver.team_colour,
-    driver.headshot_url, driver.country_code
+    driver.session_key,
+    driver.driver_number,
+    driver.full_name,
+    driver.name_acronym,
+    driver.team_name,
+    driver.team_colour,
+    driver.headshot_url,
+    driver.country_code,
   ]);
 }
 
 // --- Laps ---
 export async function getLaps(sessionKey: number, driverNumber?: number) {
-  let sql = 'SELECT * FROM laps WHERE session_key = $1';
+  let sql = "SELECT * FROM laps WHERE session_key = $1";
   const params: any[] = [sessionKey];
   if (driverNumber !== undefined) {
-    sql += ' AND driver_number = $2';
+    sql += " AND driver_number = $2";
     params.push(driverNumber);
   }
-  sql += ' ORDER BY driver_number, lap_number';
+  sql += " ORDER BY driver_number, lap_number";
   const res = await query(sql, params);
   return res.rows;
 }
@@ -123,17 +149,33 @@ export async function upsertLap(lap: any) {
       date_start = EXCLUDED.date_start
   `;
   await query(sql, [
-    lap.session_key, lap.driver_number, lap.lap_number, lap.lap_duration,
-    lap.duration_sector_1, lap.duration_sector_2, lap.duration_sector_3,
-    lap.i1_speed, lap.i2_speed, lap.st_speed, lap.is_pit_out_lap || false,
-    lap.segment_1, lap.segment_2, lap.segment_3,
-    lap.date_start, lap.lap_start_time
+    lap.session_key,
+    lap.driver_number,
+    lap.lap_number,
+    lap.lap_duration,
+    lap.duration_sector_1,
+    lap.duration_sector_2,
+    lap.duration_sector_3,
+    lap.i1_speed,
+    lap.i2_speed,
+    lap.st_speed,
+    lap.is_pit_out_lap || false,
+    lap.segment_1,
+    lap.segment_2,
+    lap.segment_3,
+    lap.date_start,
+    lap.lap_start_time,
   ]);
 }
 
 // --- Car Data ---
-export async function getCarData(sessionKey: number, driverNumber?: number, minDate?: string, maxDate?: string) {
-  let sql = 'SELECT * FROM car_data WHERE session_key = $1';
+export async function getCarData(
+  sessionKey: number,
+  driverNumber?: number,
+  minDate?: string,
+  maxDate?: string,
+) {
+  let sql = "SELECT * FROM car_data WHERE session_key = $1";
   const params: any[] = [sessionKey];
   let idx = 2;
   if (driverNumber !== undefined) {
@@ -148,7 +190,7 @@ export async function getCarData(sessionKey: number, driverNumber?: number, minD
     sql += ` AND date <= $${idx++}`;
     params.push(maxDate);
   }
-  sql += ' ORDER BY date';
+  sql += " ORDER BY date";
   const res = await query(sql, params);
   return res.rows;
 }
@@ -159,22 +201,34 @@ export async function insertCarDataBatch(rows: any[]) {
   const params: any[] = [];
   let idx = 1;
   for (const row of rows) {
-    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`);
-    params.push(row.session_key, row.driver_number, row.date, row.speed, row.throttle, row.brake, row.rpm, row.n_gear, row.drs);
+    values.push(
+      `($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`,
+    );
+    params.push(
+      row.session_key,
+      row.driver_number,
+      row.date,
+      row.speed,
+      row.throttle,
+      row.brake,
+      row.rpm,
+      row.n_gear,
+      row.drs,
+    );
   }
-  const sql = `INSERT INTO car_data (session_key, driver_number, date, speed, throttle, brake, rpm, n_gear, drs) VALUES ${values.join(', ')} ON CONFLICT DO NOTHING`;
+  const sql = `INSERT INTO car_data (session_key, driver_number, date, speed, throttle, brake, rpm, n_gear, drs) VALUES ${values.join(", ")} ON CONFLICT DO NOTHING`;
   await query(sql, params);
 }
 
 // --- Positions ---
 export async function getPositions(sessionKey: number, driverNumber?: number) {
-  let sql = 'SELECT * FROM positions WHERE session_key = $1';
+  let sql = "SELECT * FROM positions WHERE session_key = $1";
   const params: any[] = [sessionKey];
   if (driverNumber !== undefined) {
-    sql += ' AND driver_number = $2';
+    sql += " AND driver_number = $2";
     params.push(driverNumber);
   }
-  sql += ' ORDER BY date';
+  sql += " ORDER BY date";
   const res = await query(sql, params);
   return res.rows;
 }
@@ -185,18 +239,23 @@ export async function upsertPosition(pos: any) {
     VALUES ($1, $2, $3, $4)
     ON CONFLICT (session_key, driver_number, date) DO UPDATE SET position = EXCLUDED.position
   `;
-  await query(sql, [pos.session_key, pos.driver_number, pos.date, pos.position]);
+  await query(sql, [
+    pos.session_key,
+    pos.driver_number,
+    pos.date,
+    pos.position,
+  ]);
 }
 
 // --- Pit ---
 export async function getPitData(sessionKey: number, driverNumber?: number) {
-  let sql = 'SELECT * FROM pit WHERE session_key = $1';
+  let sql = "SELECT * FROM pit WHERE session_key = $1";
   const params: any[] = [sessionKey];
   if (driverNumber !== undefined) {
-    sql += ' AND driver_number = $2';
+    sql += " AND driver_number = $2";
     params.push(driverNumber);
   }
-  sql += ' ORDER BY driver_number, lap_number';
+  sql += " ORDER BY driver_number, lap_number";
   const res = await query(sql, params);
   return res.rows;
 }
@@ -210,12 +269,22 @@ export async function upsertPit(pit: any) {
       stop_duration = EXCLUDED.stop_duration,
       date = EXCLUDED.date
   `;
-  await query(sql, [pit.session_key, pit.driver_number, pit.lap_number, pit.pit_duration, pit.stop_duration, pit.date]);
+  await query(sql, [
+    pit.session_key,
+    pit.driver_number,
+    pit.lap_number,
+    pit.pit_duration,
+    pit.stop_duration,
+    pit.date,
+  ]);
 }
 
 // --- Race Control ---
 export async function getRaceControl(sessionKey: number) {
-  const res = await query('SELECT * FROM race_control WHERE session_key = $1 ORDER BY date', [sessionKey]);
+  const res = await query(
+    "SELECT * FROM race_control WHERE session_key = $1 ORDER BY date",
+    [sessionKey],
+  );
   return res.rows;
 }
 
@@ -225,22 +294,35 @@ export async function insertRaceControlBatch(rows: any[]) {
   const params: any[] = [];
   let idx = 1;
   for (const row of rows) {
-    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`);
-    params.push(row.session_key, row.category, row.flag, row.message, row.date, row.driver_number, row.lap_number);
+    values.push(
+      `($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`,
+    );
+    params.push(
+      row.session_key,
+      row.category,
+      row.flag,
+      row.message,
+      row.date,
+      row.driver_number,
+      row.lap_number,
+    );
   }
-  const sql = `INSERT INTO race_control (session_key, category, flag, message, date, driver_number, lap_number) VALUES ${values.join(', ')} ON CONFLICT DO NOTHING`;
+  const sql = `INSERT INTO race_control (session_key, category, flag, message, date, driver_number, lap_number) VALUES ${values.join(", ")} ON CONFLICT DO NOTHING`;
   await query(sql, params);
 }
 
 // --- Location ---
-export async function getLocationData(sessionKey: number, driverNumber?: number) {
-  let sql = 'SELECT * FROM location WHERE session_key = $1';
+export async function getLocationData(
+  sessionKey: number,
+  driverNumber?: number,
+) {
+  let sql = "SELECT * FROM location WHERE session_key = $1";
   const params: any[] = [sessionKey];
   if (driverNumber !== undefined) {
-    sql += ' AND driver_number = $2';
+    sql += " AND driver_number = $2";
     params.push(driverNumber);
   }
-  sql += ' ORDER BY date';
+  sql += " ORDER BY date";
   const res = await query(sql, params);
   return res.rows;
 }
@@ -251,39 +333,62 @@ export async function insertLocationBatch(rows: any[]) {
   const params: any[] = [];
   let idx = 1;
   for (const row of rows) {
-    values.push(`($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`);
-    params.push(row.session_key, row.driver_number, row.date, row.x, row.y, row.z);
+    values.push(
+      `($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`,
+    );
+    params.push(
+      row.session_key,
+      row.driver_number,
+      row.date,
+      row.x,
+      row.y,
+      row.z,
+    );
   }
-  const sql = `INSERT INTO location (session_key, driver_number, date, x, y, z) VALUES ${values.join(', ')} ON CONFLICT DO NOTHING`;
+  const sql = `INSERT INTO location (session_key, driver_number, date, x, y, z) VALUES ${values.join(", ")} ON CONFLICT DO NOTHING`;
   await query(sql, params);
 }
 
 // --- Import Status ---
 export async function createImportStatus(sessionKey: number) {
   const res = await query(
-    'INSERT INTO import_status (session_key, status) VALUES ($1, $2) RETURNING id',
-    [sessionKey, 'pending']
+    "INSERT INTO import_status (session_key, status) VALUES ($1, $2) RETURNING id",
+    [sessionKey, "pending"],
   );
   return res.rows[0].id;
 }
 
-export async function updateImportStatus(id: number, status: string, stage?: string, progress?: number, errorMessage?: string) {
+export async function updateImportStatus(
+  id: number,
+  status: string,
+  stage?: string,
+  progress?: number,
+  errorMessage?: string,
+) {
   const sql = `
     UPDATE import_status SET status = $1, stage = $2, progress = $3, error_message = $4, updated_at = NOW()
     WHERE id = $5
   `;
-  await query(sql, [status, stage || null, progress ?? null, errorMessage || null, id]);
+  await query(sql, [
+    status,
+    stage || null,
+    progress ?? null,
+    errorMessage || null,
+    id,
+  ]);
 }
 
 export async function getImportStatus(sessionKey: number) {
   const res = await query(
-    'SELECT * FROM import_status WHERE session_key = $1 ORDER BY created_at DESC LIMIT 1',
-    [sessionKey]
+    "SELECT * FROM import_status WHERE session_key = $1 ORDER BY created_at DESC LIMIT 1",
+    [sessionKey],
   );
   return res.rows[0] || null;
 }
 
 export async function getLatestImportStatus() {
-  const res = await query('SELECT * FROM import_status ORDER BY created_at DESC LIMIT 1');
+  const res = await query(
+    "SELECT * FROM import_status ORDER BY created_at DESC LIMIT 1",
+  );
   return res.rows[0] || null;
 }

@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { getPitData, getDrivers, PitStop, Driver } from '../../api/client';
-import { Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from "recharts";
+import { getPitData, getDrivers, PitStop, Driver } from "../../api/client";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface PitStopsWidgetProps {
   sessionKey: number;
@@ -21,46 +30,49 @@ export default function PitStopsWidget({ sessionKey, driverNumbers }: PitStopsWi
       setError(null);
       try {
         const drivers: Driver[] = await getDrivers(sessionKey);
-        const driverMap = new Map(drivers.map(d => [d.driver_number, d]));
-        
-        const nums = driverNumbers.length > 0 ? driverNumbers : drivers.map(d => d.driver_number);
+        const driverMap = new Map(drivers.map((d) => [d.driver_number, d]));
+
+        const nums = driverNumbers.length > 0 ? driverNumbers : drivers.map((d) => d.driver_number);
         const allPitData: PitStop[] = [];
-        
+
         for (const dn of nums) {
           const pitData = await getPitData(sessionKey, dn);
           allPitData.push(...pitData);
         }
-        
+
         // Group by driver and calculate average pit stop duration
         const pitByDriver = new Map<number, PitStop[]>();
-        allPitData.forEach(p => {
+        allPitData.forEach((p) => {
           if (!pitByDriver.has(p.driver_number)) pitByDriver.set(p.driver_number, []);
           pitByDriver.get(p.driver_number)!.push(p);
         });
-        
-        const chartData = Array.from(pitByDriver.entries()).map(([dn, stops]) => {
-          const validStops = stops.filter(s => s.pit_duration && s.pit_duration > 0);
-          const avgDuration = validStops.length > 0
-            ? validStops.reduce((sum, s) => sum + s.pit_duration, 0) / validStops.length
-            : 0;
-          const totalDuration = stops.reduce((sum, s) => sum + (s.pit_duration || 0), 0);
-          
-          const driver = driverMap.get(dn);
-          const acronym = driver?.name_acronym || `#${dn}`;
-          const color = driver?.team_colour ? `#${driver.team_colour}` : '#888';
-          
-          return {
-            name: acronym,
-            avgDuration: parseFloat(avgDuration.toFixed(2)),
-            totalDuration: parseFloat(totalDuration.toFixed(2)),
-            stops: validStops.length,
-            fill: color,
-          };
-        }).sort((a, b) => b.avgDuration - a.avgDuration);
-        
+
+        const chartData = Array.from(pitByDriver.entries())
+          .map(([dn, stops]) => {
+            const validStops = stops.filter((s) => s.pit_duration && s.pit_duration > 0);
+            const avgDuration =
+              validStops.length > 0
+                ? validStops.reduce((sum, s) => sum + s.pit_duration, 0) / validStops.length
+                : 0;
+            const totalDuration = stops.reduce((sum, s) => sum + (s.pit_duration || 0), 0);
+
+            const driver = driverMap.get(dn);
+            const acronym = driver?.name_acronym || `#${dn}`;
+            const color = driver?.team_colour ? `#${driver.team_colour}` : "#888";
+
+            return {
+              name: acronym,
+              avgDuration: parseFloat(avgDuration.toFixed(2)),
+              totalDuration: parseFloat(totalDuration.toFixed(2)),
+              stops: validStops.length,
+              fill: color
+            };
+          })
+          .sort((a, b) => b.avgDuration - a.avgDuration);
+
         setData(chartData);
       } catch (err: any) {
-        setError(err.message || 'Failed to load pit stop data');
+        setError(err.message || "Failed to load pit stop data");
       } finally {
         setLoading(false);
       }
@@ -70,18 +82,18 @@ export default function PitStopsWidget({ sessionKey, driverNumbers }: PitStopsWi
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-6 h-6 text-racing-red-500 animate-spin" />
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="w-6 h-6 text-red-400 mx-auto mb-2" />
-          <p className="text-red-300 text-xs">{error}</p>
+          <AlertCircle className="mx-auto mb-2 h-6 w-6 text-red-400" />
+          <p className="text-xs text-red-300">{error}</p>
         </div>
       </div>
     );
@@ -89,8 +101,8 @@ export default function PitStopsWidget({ sessionKey, driverNumbers }: PitStopsWi
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-gray-500 text-sm">No pit stop data available</p>
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-gray-500">No pit stop data available</p>
       </div>
     );
   }
@@ -99,19 +111,34 @@ export default function PitStopsWidget({ sessionKey, driverNumbers }: PitStopsWi
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }} layout="vertical">
         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-        <XAxis type="number" tick={{ fill: '#999', fontSize: 10 }} stroke="#555" />
-        <YAxis dataKey="name" type="category" tick={{ fill: '#999', fontSize: 11 }} stroke="#555" width={40} />
+        <XAxis type="number" tick={{ fill: "#999", fontSize: 10 }} stroke="#555" />
+        <YAxis
+          dataKey="name"
+          type="category"
+          tick={{ fill: "#999", fontSize: 11 }}
+          stroke="#555"
+          width={40}
+        />
         <Tooltip
-          contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #333', borderRadius: '8px' }}
-          labelStyle={{ color: '#fff' }}
+          contentStyle={{
+            backgroundColor: "#1a1a2e",
+            border: "1px solid #333",
+            borderRadius: "8px"
+          }}
+          labelStyle={{ color: "#fff" }}
           formatter={(value: any, name: string) => {
-            if (name === 'avgDuration') return [`${value}s`, 'Avg Pit Duration'];
-            if (name === 'stops') return [value, 'Stops'];
+            if (name === "avgDuration") return [`${value}s`, "Avg Pit Duration"];
+            if (name === "stops") return [value, "Stops"];
             return [value, name];
           }}
         />
-        <Legend wrapperStyle={{ fontSize: '11px' }} />
-        <Bar dataKey="avgDuration" name="Avg Pit Duration (s)" fill="#dd2295" radius={[0, 4, 4, 0]} />
+        <Legend wrapperStyle={{ fontSize: "11px" }} />
+        <Bar
+          dataKey="avgDuration"
+          name="Avg Pit Duration (s)"
+          fill="#dd2295"
+          radius={[0, 4, 4, 0]}
+        />
       </BarChart>
     </ResponsiveContainer>
   );

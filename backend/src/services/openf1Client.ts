@@ -1,11 +1,15 @@
-const BASE_URL = process.env.OPENF1_BASE_URL || 'https://api.openf1.org/v1';
+const BASE_URL = process.env.OPENF1_BASE_URL || "https://api.openf1.org/v1";
 
 interface RateLimitState {
   requestsThisSecond: number;
   requestsThisMinute: number;
   lastSecondReset: number;
   lastMinuteReset: number;
-  queue: Array<{ resolve: (data: any) => void; reject: (err: any) => void; url: string }>;
+  queue: Array<{
+    resolve: (data: any) => void;
+    reject: (err: any) => void;
+    url: string;
+  }>;
   processing: boolean;
 }
 
@@ -18,8 +22,8 @@ const state: RateLimitState = {
   processing: false,
 };
 
-const MAX_PER_SECOND = parseInt(process.env.RATE_LIMIT_PER_SECOND || '3', 10);
-const MAX_PER_MINUTE = parseInt(process.env.RATE_LIMIT_PER_MINUTE || '30', 10);
+const MAX_PER_SECOND = parseInt(process.env.RATE_LIMIT_PER_SECOND || "3", 10);
+const MAX_PER_MINUTE = parseInt(process.env.RATE_LIMIT_PER_MINUTE || "30", 10);
 
 function checkRateLimit(): boolean {
   const now = Date.now();
@@ -31,27 +35,30 @@ function checkRateLimit(): boolean {
     state.requestsThisMinute = 0;
     state.lastMinuteReset = now;
   }
-  return state.requestsThisSecond < MAX_PER_SECOND && state.requestsThisMinute < MAX_PER_MINUTE;
+  return (
+    state.requestsThisSecond < MAX_PER_SECOND &&
+    state.requestsThisMinute < MAX_PER_MINUTE
+  );
 }
 
 async function processQueue() {
   if (state.processing) return;
   state.processing = true;
-  
+
   while (state.queue.length > 0) {
     if (!checkRateLimit()) {
       const waitMs = Math.min(
         1000 - (Date.now() - state.lastSecondReset) + 50,
-        60000 - (Date.now() - state.lastMinuteReset) + 50
+        60000 - (Date.now() - state.lastMinuteReset) + 50,
       );
-      await new Promise(r => setTimeout(r, Math.max(waitMs, 50)));
+      await new Promise((r) => setTimeout(r, Math.max(waitMs, 50)));
       continue;
     }
-    
+
     const item = state.queue.shift()!;
     state.requestsThisSecond++;
     state.requestsThisMinute++;
-    
+
     try {
       const response = await fetch(item.url);
       if (!response.ok) {
@@ -65,7 +72,7 @@ async function processQueue() {
       item.reject(err);
     }
   }
-  
+
   state.processing = false;
 }
 
@@ -77,7 +84,7 @@ async function rateLimitedFetch(url: string): Promise<any> {
 }
 
 export async function fetchMeetings(year?: number) {
-  const params = year ? `?year=${year}` : '';
+  const params = year ? `?year=${year}` : "";
   return rateLimitedFetch(`${BASE_URL}/meetings${params}`);
 }
 
@@ -101,7 +108,10 @@ export async function fetchCarData(sessionKey: number, driverNumber?: number) {
   return rateLimitedFetch(url);
 }
 
-export async function fetchPositions(sessionKey: number, driverNumber?: number) {
+export async function fetchPositions(
+  sessionKey: number,
+  driverNumber?: number,
+) {
   let url = `${BASE_URL}/position?session_key=${sessionKey}`;
   if (driverNumber !== undefined) url += `&driver_number=${driverNumber}`;
   return rateLimitedFetch(url);
@@ -123,21 +133,21 @@ export async function fetchLocation(sessionKey: number, driverNumber?: number) {
   return rateLimitedFetch(url);
 }
 
-export type ImportStage = 
-  | 'fetching_meeting'
-  | 'fetching_sessions'
-  | 'fetching_drivers'
-  | 'fetching_laps'
-  | 'fetching_car_data'
-  | 'fetching_positions'
-  | 'fetching_pit'
-  | 'fetching_race_control'
-  | 'fetching_location'
-  | 'complete'
-  | 'error';
+export type ImportStage =
+  | "fetching_meeting"
+  | "fetching_sessions"
+  | "fetching_drivers"
+  | "fetching_laps"
+  | "fetching_car_data"
+  | "fetching_positions"
+  | "fetching_pit"
+  | "fetching_race_control"
+  | "fetching_location"
+  | "complete"
+  | "error";
 
 export interface ImportProgress {
-  status: 'pending' | 'running' | 'complete' | 'error';
+  status: "pending" | "running" | "complete" | "error";
   stage: ImportStage;
   progress: number; // 0-100
   message: string;
