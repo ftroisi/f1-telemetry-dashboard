@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import GridLayout from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
 import { getDrivers, Driver } from "../api/client";
 import {
   WidgetConfig,
-  LayoutItem,
+  type LayoutItem,
   loadDashboardState,
   saveDashboardState,
   getDefaultWidgets,
@@ -68,8 +66,8 @@ export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) 
     }
   }, [widgets, layouts, sessionKey]);
 
-  const handleLayoutChange = useCallback((newLayout: LayoutItem[]) => {
-    setLayouts(newLayout);
+  const handleLayoutChange = useCallback((newLayout: import("react-grid-layout").Layout) => {
+    setLayouts([...newLayout]);
   }, []);
 
   const handleUpdateWidget = useCallback((widgetId: string, config: Partial<WidgetConfig>) => {
@@ -199,14 +197,10 @@ export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) 
           <GridLayout
             className="layout"
             layout={gridLayout}
-            cols={12}
-            rowHeight={100}
             width={1200}
             onLayoutChange={handleLayoutChange}
-            draggableHandle=".drag-handle"
-            compactType="vertical"
-            margin={[16, 16]}
-            containerPadding={[0, 0]}
+            gridConfig={{ cols: 12, rowHeight: 100, margin: [16, 16], containerPadding: [0, 0] }}
+            dragConfig={{ handle: ".drag-handle" }}
           >
             {widgets.map((widget) => (
               <div

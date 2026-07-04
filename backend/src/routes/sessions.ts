@@ -17,12 +17,12 @@ import {
   serializePit,
 } from "../proto/serializer";
 
-const router = Router();
+const router: import("express").Router = Router();
 
 // GET /sessions/:sessionKey/drivers
 router.get("/:sessionKey/drivers", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const drivers = await getDrivers(sessionKey);
     const format = getFormat(req);
     sendResponse(res, drivers, format, serializeDrivers);
@@ -36,9 +36,9 @@ router.get("/:sessionKey/drivers", async (req: Request, res: Response) => {
 // GET /sessions/:sessionKey/laps
 router.get("/:sessionKey/laps", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const driverNumber = req.query.driver_number
-      ? parseInt(req.query.driver_number as string, 10)
+      ? parseInt(String(req.query.driver_number), 10)
       : undefined;
     const laps = await getLaps(sessionKey, driverNumber);
     const format = getFormat(req);
@@ -53,9 +53,9 @@ router.get("/:sessionKey/laps", async (req: Request, res: Response) => {
 // GET /sessions/:sessionKey/car-data
 router.get("/:sessionKey/car-data", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const driverNumber = req.query.driver_number
-      ? parseInt(req.query.driver_number as string, 10)
+      ? parseInt(String(req.query.driver_number), 10)
       : undefined;
     const minDate = req.query.min_date as string | undefined;
     const maxDate = req.query.max_date as string | undefined;
@@ -77,9 +77,9 @@ router.get("/:sessionKey/car-data", async (req: Request, res: Response) => {
 // GET /sessions/:sessionKey/positions
 router.get("/:sessionKey/positions", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const driverNumber = req.query.driver_number
-      ? parseInt(req.query.driver_number as string, 10)
+      ? parseInt(String(req.query.driver_number), 10)
       : undefined;
     const positions = await getPositions(sessionKey, driverNumber);
     const format = getFormat(req);
@@ -94,9 +94,9 @@ router.get("/:sessionKey/positions", async (req: Request, res: Response) => {
 // GET /sessions/:sessionKey/pit
 router.get("/:sessionKey/pit", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const driverNumber = req.query.driver_number
-      ? parseInt(req.query.driver_number as string, 10)
+      ? parseInt(String(req.query.driver_number), 10)
       : undefined;
     const pit = await getPitData(sessionKey, driverNumber);
     const format = getFormat(req);
@@ -111,9 +111,9 @@ router.get("/:sessionKey/pit", async (req: Request, res: Response) => {
 // GET /sessions/:sessionKey/location
 router.get("/:sessionKey/location", async (req: Request, res: Response) => {
   try {
-    const sessionKey = parseInt(req.params.sessionKey, 10);
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
     const driverNumber = req.query.driver_number
-      ? parseInt(req.query.driver_number as string, 10)
+      ? parseInt(String(req.query.driver_number), 10)
       : undefined;
     const location = await getLocationData(sessionKey, driverNumber);
     const format = getFormat(req);

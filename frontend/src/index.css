@@ -1,6 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-racing-red-50: #fee6e7;
+  --color-racing-red-100: #fdced0;
+  --color-racing-red-200: #fc9ca1;
+  --color-racing-red-300: #fa6b72;
+  --color-racing-red-400: #f93943;
+  --color-racing-red-500: #f70814;
+  --color-racing-red-600: #c60610;
+  --color-racing-red-700: #94050c;
+  --color-racing-red-800: #630308;
+  --color-racing-red-900: #310204;
+  --color-racing-red-950: #230103;
+
+  --color-midnight-violet-50: #f8edf3;
+  --color-midnight-violet-100: #f1dae7;
+  --color-midnight-violet-200: #e3b5d0;
+  --color-midnight-violet-300: #d590b8;
+  --color-midnight-violet-400: #c76ba1;
+  --color-midnight-violet-500: #b94689;
+  --color-midnight-violet-600: #94386e;
+  --color-midnight-violet-700: #6f2a52;
+  --color-midnight-violet-800: #4a1c37;
+  --color-midnight-violet-900: #250e1b;
+  --color-midnight-violet-950: #1a0a13;
+
+  --color-crimson-violet-50: #fce9f4;
+  --color-crimson-violet-100: #f8d3ea;
+  --color-crimson-violet-200: #f1a7d5;
+  --color-crimson-violet-300: #ea7bc0;
+  --color-crimson-violet-400: #e34faa;
+  --color-crimson-violet-500: #dd2295;
+  --color-crimson-violet-600: #b01c77;
+  --color-crimson-violet-700: #84155a;
+  --color-crimson-violet-800: #580e3c;
+  --color-crimson-violet-900: #2c071e;
+  --color-crimson-violet-950: #1f0515;
+
+  --color-mustard-50: #fffae6;
+  --color-mustard-100: #fef5cd;
+  --color-mustard-200: #fdeb9b;
+  --color-mustard-300: #fde168;
+  --color-mustard-400: #fcd836;
+  --color-mustard-500: #fbce04;
+  --color-mustard-600: #c9a503;
+  --color-mustard-700: #977b02;
+  --color-mustard-800: #645202;
+  --color-mustard-900: #322901;
+  --color-mustard-950: #231d01;
+
+  --color-sky-surge-50: #e8f6fc;
+  --color-sky-surge-100: #d2edf9;
+  --color-sky-surge-200: #a4dcf4;
+  --color-sky-surge-300: #77caee;
+  --color-sky-surge-400: #49b9e9;
+  --color-sky-surge-500: #1ca7e3;
+  --color-sky-surge-600: #1686b6;
+  --color-sky-surge-700: #116488;
+  --color-sky-surge-800: #0b435b;
+  --color-sky-surge-900: #06212d;
+  --color-sky-surge-950: #041720;
+}
 
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

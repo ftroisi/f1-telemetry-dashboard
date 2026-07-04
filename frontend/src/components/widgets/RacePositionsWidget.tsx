@@ -166,7 +166,7 @@ export default function RacePositionsWidget({
             borderRadius: "8px"
           }}
           labelStyle={{ color: "#fff" }}
-          formatter={(value: any, name: string) => [value, name]}
+          formatter={(value: any, name: any) => [value, name]}
         />
         <Legend wrapperStyle={{ fontSize: "11px" }} />
         {driverKeys.map((key, idx) => (

@@ -126,7 +126,7 @@ export default function PitStopsWidget({ sessionKey, driverNumbers }: PitStopsWi
             borderRadius: "8px"
           }}
           labelStyle={{ color: "#fff" }}
-          formatter={(value: any, name: string) => {
+          formatter={(value: any, name: any) => {
             if (name === "avgDuration") return [`${value}s`, "Avg Pit Duration"];
             if (name === "stops") return [value, "Stops"];
             return [value, name];

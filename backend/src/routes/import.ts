@@ -6,7 +6,7 @@ import {
   serializeImportStatus,
 } from "../proto/serializer";
 
-const router = Router();
+const router: import("express").Router = Router();
 
 // POST /import - Trigger import for a given session
 router.post("/", async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.get("/status", async (req: Request, res: Response) => {
   try {
     const sessionKey = req.query.session_key
-      ? parseInt(req.query.session_key as string, 10)
+      ? parseInt(String(req.query.session_key), 10)
       : undefined;
 
     let progress;

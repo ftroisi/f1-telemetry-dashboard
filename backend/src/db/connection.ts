@@ -17,7 +17,7 @@ pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
 });
 
-export async function query(text: string, params?: any[]) {
+export async function query(text: string, params?: any[]): Promise<import("pg").QueryResult> {
   const start = Date.now();
   const res = await pool.query(text, params);
   const duration = Date.now() - start;
@@ -27,7 +27,7 @@ export async function query(text: string, params?: any[]) {
   return res;
 }
 
-export async function getClient() {
+export async function getClient(): Promise<import("pg").PoolClient> {
   return pool.connect();
 }
 

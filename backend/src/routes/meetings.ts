@@ -13,13 +13,13 @@ import {
   serializeSessions,
 } from "../proto/serializer";
 
-const router = Router();
+const router: import("express").Router = Router();
 
 // GET /meetings - List available meetings (from OpenF1 for selection, fallback to local)
 router.get("/", async (req: Request, res: Response) => {
   try {
     const year = req.query.year
-      ? parseInt(req.query.year as string, 10)
+      ? parseInt(String(req.query.year), 10)
       : undefined;
 
     // Try OpenF1 first (for the selection UI)
@@ -46,7 +46,7 @@ router.get("/", async (req: Request, res: Response) => {
 // GET /meetings/:meetingKey/sessions
 router.get("/:meetingKey/sessions", async (req: Request, res: Response) => {
   try {
-    const meetingKey = parseInt(req.params.meetingKey, 10);
+    const meetingKey = parseInt(String(req.params.meetingKey), 10);
 
     let sessions: any[];
     try {
@@ -68,7 +68,7 @@ router.get("/:meetingKey/sessions", async (req: Request, res: Response) => {
 // POST /meetings/:meetingKey/sync - Sync meeting to local DB
 router.post("/:meetingKey/sync", async (req: Request, res: Response) => {
   try {
-    const meetingKey = parseInt(req.params.meetingKey, 10);
+    const meetingKey = parseInt(String(req.params.meetingKey), 10);
     const meetings = await fetchMeetings();
     const meetingList = Array.isArray(meetings) ? meetings : [meetings];
     const meeting = meetingList.find((m: any) => m.meeting_key === meetingKey);

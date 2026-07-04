@@ -1,39 +1,24 @@
-const API_BASE = "/api";
+import axios from "axios";
 
-interface FetchOptions {
-  method?: string;
-  body?: any;
-  headers?: Record<string, string>;
+const apiClient = axios.create({
+  baseURL: "/api",
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
+
+async function apiGet<T>(path: string, protobuf = false): Promise<T> {
+  const accepts = protobuf ? "application/x-protobuf" : "application/json";
+  const res = await apiClient.get(path, {
+    headers: { Accept: accepts },
+    responseType: protobuf ? "arraybuffer" : "json"
+  });
+  return res.data as T;
 }
 
-async function fetchApi(path: string, options: FetchOptions = {}) {
-  const url = `${API_BASE}${path}`;
-  const headers: Record<string, string> = {
-    ...options.headers
-  };
-
-  if (options.body && !(options.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  const res = await fetch(url, {
-    method: options.method || "GET",
-    headers,
-    body: options.body ? JSON.stringify(options.body) : undefined
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message || `HTTP ${res.status}`);
-  }
-
-  const contentType = res.headers.get("content-type") || "";
-  if (contentType.includes("application/x-protobuf")) {
-    // For protobuf, return the array buffer (will be decoded by specific functions if needed)
-    return res.arrayBuffer();
-  }
-
-  return res.json();
+async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  const res = await apiClient.post(path, body);
+  return res.data as T;
 }
 
 export interface Meeting {
@@ -125,25 +110,25 @@ export interface ImportProgress {
 }
 
 export async function checkHealth(): Promise<{ has_data: boolean; session_count: number }> {
-  return fetchApi("/health");
+  return apiGet("/health");
 }
 
 export async function getMeetings(year?: number): Promise<Meeting[]> {
   const params = year ? `?year=${year}` : "";
-  return fetchApi(`/meetings${params}`);
+  return apiGet(`/meetings${params}`);
 }
 
 export async function getSessions(meetingKey: number): Promise<Session[]> {
-  return fetchApi(`/meetings/${meetingKey}/sessions`);
+  return apiGet(`/meetings/${meetingKey}/sessions`);
 }
 
 export async function getDrivers(sessionKey: number): Promise<Driver[]> {
-  return fetchApi(`/sessions/${sessionKey}/drivers`);
+  return apiGet(`/sessions/${sessionKey}/drivers`);
 }
 
 export async function getLaps(sessionKey: number, driverNumber?: number): Promise<Lap[]> {
   const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
-  return fetchApi(`/sessions/${sessionKey}/laps${params}`);
+  return apiGet(`/sessions/${sessionKey}/laps${params}`);
 }
 
 export async function getCarData(
@@ -157,35 +142,32 @@ export async function getCarData(
   if (minDate) params.set("min_date", minDate);
   if (maxDate) params.set("max_date", maxDate);
   const qs = params.toString();
-  return fetchApi(`/sessions/${sessionKey}/car-data${qs ? `?${qs}` : ""}`);
+  return apiGet(`/sessions/${sessionKey}/car-data${qs ? `?${qs}` : ""}`);
 }
 
 export async function getPositions(sessionKey: number, driverNumber?: number): Promise<Position[]> {
   const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
-  return fetchApi(`/sessions/${sessionKey}/positions${params}`);
+  return apiGet(`/sessions/${sessionKey}/positions${params}`);
 }
 
 export async function getPitData(sessionKey: number, driverNumber?: number): Promise<PitStop[]> {
   const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
-  return fetchApi(`/sessions/${sessionKey}/pit${params}`);
+  return apiGet(`/sessions/${sessionKey}/pit${params}`);
 }
 
 export async function getLocationData(sessionKey: number, driverNumber?: number): Promise<any[]> {
   const params = driverNumber !== undefined ? `?driver_number=${driverNumber}` : "";
-  return fetchApi(`/sessions/${sessionKey}/location${params}`);
+  return apiGet(`/sessions/${sessionKey}/location${params}`);
 }
 
 export async function triggerImport(
   sessionKey: number,
   meetingKey: number
 ): Promise<{ import_id: number; status: string }> {
-  return fetchApi("/import", {
-    method: "POST",
-    body: { session_key: sessionKey, meeting_key: meetingKey }
-  });
+  return apiPost("/import", { session_key: sessionKey, meeting_key: meetingKey });
 }
 
 export async function getImportStatus(sessionKey?: number): Promise<ImportProgress> {
   const params = sessionKey ? `?session_key=${sessionKey}` : "";
-  return fetchApi(`/import/status${params}`);
+  return apiGet(`/import/status${params}`);
 }
