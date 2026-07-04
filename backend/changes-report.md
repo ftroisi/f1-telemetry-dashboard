@@ -22,7 +22,22 @@ The `package.json` declares `minimumReleaseAgeExclude` in `pnpm-workspace.yaml` 
 
 ---
 
-## 2. ⬆️ Package Manager & Workspace Alignment
+## 2. 🐘 PostgreSQL 18 Data Directory Change
+
+### Issue
+`postgres:18-alpine3.23` changed its data storage convention. It expects the mount point to be `/var/lib/postgresql` (the parent directory) so it can create a version-specific subdirectory (e.g. `/var/lib/postgresql/18/data`). The old mount at `/var/lib/postgresql/data` collides with this.
+
+Additionally, the old named volume likely contains data from a previous PostgreSQL version, which PG18 refuses to use without an explicit upgrade.
+
+### Fix
+- **`docker-compose.yml`** — Changed volume mount from `f1-postgres-data:/var/lib/postgresql/data` to `f1-postgres-data:/var/lib/postgresql`.
+
+### User action required
+Run `docker compose down -v` to remove the stale volume, then `docker compose up --build` for a clean start.
+
+---
+
+## 3. ⬆️ Package Manager & Workspace Alignment
 
 ### Backend (`backend/`)
 - `pnpm-workspace.yaml` was already correctly configured — left as-is.
@@ -37,7 +52,7 @@ The `package.json` declares `minimumReleaseAgeExclude` in `pnpm-workspace.yaml` 
 
 ---
 
-## 3. 🔧 Frontend: API Client → `axios`
+## 4. 🔧 Frontend: API Client → `axios`
 
 ### Changed file
 - **`frontend/src/api/client.ts`** — Replaced the custom `fetchApi()` wrapper with `axios`.
@@ -49,7 +64,7 @@ The `package.json` declares `minimumReleaseAgeExclude` in `pnpm-workspace.yaml` 
 
 ---
 
-## 4. 🎨 Frontend: Tailwind v3 → v4 Migration
+## 5. 🎨 Frontend: Tailwind v3 → v4 Migration
 
 ### Why
 `frontend/package.json` specifies `tailwindcss@^4.3.2` but the project used a v3-style `tailwind.config.js` and `@tailwind` CSS directives.
@@ -66,7 +81,7 @@ The `package.json` declares `minimumReleaseAgeExclude` in `pnpm-workspace.yaml` 
 
 ---
 
-## 5. 🏗️ Build & TypeScript Fixes
+## 6. 🏗️ Build & TypeScript Fixes
 
 ### Backend (TypeScript 6 with Express 5)
 
@@ -90,7 +105,7 @@ The `package.json` declares `minimumReleaseAgeExclude` in `pnpm-workspace.yaml` 
 
 ---
 
-## 6. ✅ Final Build Verification
+## 7. ✅ Build Verification
 
 ```
 $ docker compose build
@@ -105,9 +120,10 @@ $ docker compose build
 
 ---
 
-## 7. 🔬 Changed Files (Git Summary)
+## 8. 🔬 Changed Files (Git Summary)
 
 ```
+M  docker-compose.yml                              # PG18 mount path fix
 M  backend/Dockerfile                              # npm install -g pnpm, pnpm-workspace.yaml copy
 M  backend/src/db/connection.ts                    # explicit return types
 M  backend/src/routes/import.ts                    # Express 5 type-safe parseInt
