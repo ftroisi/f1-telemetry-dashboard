@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   getMeetings,
   getSessions,
@@ -19,8 +19,6 @@ import {
   Typography,
   Button,
   CircularProgress,
-  LinearProgress,
-  Chip,
   createTheme,
   ThemeProvider
 } from "@mui/material";
@@ -34,7 +32,7 @@ import {
   Loader2
 } from "lucide-react";
 
-// Dark F1 theme for MUI components
+// Dark F1 theme for MUI components (kept for component-level overrides)
 const f1Theme = createTheme({
   palette: {
     mode: "dark",
@@ -43,41 +41,6 @@ const f1Theme = createTheme({
     background: { default: "#0f1115", paper: "#161b22" },
     text: { primary: "#ffffff", secondary: "#9ca3af" },
     divider: "rgba(255,255,255,0.08)",
-  },
-  components: {
-    MuiOutlinedInput: {
-      styleOverrides: {
-        root: {
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#f70814",
-          },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "rgba(255,255,255,0.23)",
-          },
-        },
-        notchedOutline: { borderColor: "rgba(255,255,255,0.12)" },
-      },
-    },
-    MuiInputLabel: { styleOverrides: { root: { color: "#9ca3af" } } },
-    MuiAutocomplete: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: "#161b22",
-          border: "1px solid rgba(255,255,255,0.08)",
-        },
-        option: {
-          "&[aria-selected='true']": { backgroundColor: "rgba(247,8,20,0.15)" },
-          "&.Mui-focused": { backgroundColor: "rgba(255,255,255,0.05)" },
-        },
-      },
-    },
-    MuiMenuItem: {
-      styleOverrides: {
-        root: {
-          "&.Mui-selected": { backgroundColor: "rgba(247,8,20,0.15)" },
-        },
-      },
-    },
   },
 });
 
@@ -99,10 +62,10 @@ const STAGES = [
   "fetching_location",
 ] as const;
 
-export default function Onboarding({
+const Onboarding = ({
   onImportComplete,
   onSelectSession,
-}: OnboardingProps) {
+}: OnboardingProps) => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
@@ -122,7 +85,6 @@ export default function Onboarding({
       setLoadingMeetings(true);
       try {
         const meetingsData = await getMeetings(year);
-        console.log("Fetched meetings:", meetingsData);
         if (!cancelled) {
           setMeetings(meetingsData || []);
           setSelectedMeeting(null);
@@ -208,86 +170,69 @@ export default function Onboarding({
   const getSessionTypeIcon = (type: string) => {
     switch (type?.toLowerCase()) {
       case "race":
-        return <Flag className="text-racing-red-500 h-4 w-4" />;
+        return <Flag className="h-4 w-4 shrink-0 text-racing-red-500" />;
       case "qualifying":
-        return <Timer className="text-mustard-500 h-4 w-4" />;
+        return <Timer className="h-4 w-4 shrink-0 text-mustard-500" />;
       default:
-        return <Activity className="text-sky-surge-500 h-4 w-4" />;
+        return <Activity className="h-4 w-4 shrink-0 text-sky-surge-500" />;
     }
   };
 
   return (
     <ThemeProvider theme={f1Theme}>
-      <Box sx={{ minHeight: "100vh", bgcolor: "#0f1115" }}>
+      <Box className="h-full w-full flex flex-col items-center justify-center bg-[#0f1115]">
         {/* Header */}
-        <Box
-          component="header"
-          sx={{ borderBottom: 1, borderColor: "divider", px: 6, py: 4 }}
-        >
-          <Box sx={{ mx: "auto", maxWidth: 720, display: "flex", alignItems: "center", gap: 2 }}>
-            <Box
-              sx={{
-                bgcolor: "#c60610",
-                width: 36, height: 36,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                borderRadius: 1, fontSize: 14, fontWeight: 700,
-              }}
-            >
+        <Box component="header" className="border-b border-[rgba(255,255,255,0.08)] px-6 py-4">
+          <Box className="mx-auto flex max-w-180 items-center gap-3">
+            <Box className="flex h-9 w-9 items-center justify-center rounded bg-racing-red-600 text-sm font-bold">
               F1
             </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              F1 Telemetry Dashboard
-            </Typography>
+            <Typography className="text-lg font-bold">F1 Telemetry Dashboard</Typography>
           </Box>
         </Box>
 
-        <Box sx={{ mx: "auto", maxWidth: 720, px: 6, py: 6 }}>
+        <Box className="mx-auto max-w-180 px-6 py-6">
           {/* Import Progress View */}
           {importing && importProgress && (
-            <Box sx={{ textAlign: "center", mt: 4 }}>
-              <Box sx={{ borderRadius: 3, border: 1, borderColor: "divider", bgcolor: "#161b22", p: 5 }}>
-                <Loader2 className="text-racing-red-500 mx-auto mb-4 h-12 w-12 animate-spin" />
-                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+            <Box className="mt-4 text-center">
+              <Box className="flex flex-col items-center justify-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#161b22] p-6">
+                <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-racing-red-500" />
+                <Typography className="mb-1 text-xl font-bold">
                   Importing Session Data
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                <Typography className="mb-4 text-sm text-gray-400">
                   {importProgress.message}
                 </Typography>
 
-                <LinearProgress
-                  variant="determinate"
-                  value={importProgress.progress}
-                  sx={{
-                    height: 10,
-                    borderRadius: 5,
-                    bgcolor: "#1f2937",
-                    "& .MuiLinearProgress-bar": { bgcolor: "#f70814", borderRadius: 5 },
-                  }}
-                />
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                {/* Custom progress bar */}
+                <Box className="h-2.5 w-full overflow-hidden rounded-full bg-gray-700">
+                  <Box
+                    className="h-full rounded-full bg-racing-red-500 transition-all duration-300"
+                    style={{ width: `${importProgress.progress}%` }}
+                  />
+                </Box>
+                <Typography className="mt-1 text-xs text-gray-400">
                   {importProgress.progress}%
                 </Typography>
 
-                <Box sx={{ mt: 4, textAlign: "left", maxWidth: 400, mx: "auto" }}>
+                <Box className="mx-auto mt-4 max-w-100 text-left">
                   {STAGES.map((stage) => {
                     const idx = STAGES.indexOf(stage);
                     const done = idx < currentStageIdx;
                     const active = idx === currentStageIdx;
                     return (
-                      <Box key={stage} sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.5 }}>
+                      <Box key={stage} className="flex items-center gap-1.5 py-0.5">
                         {done ? (
-                          <CheckCircle className="text-green-400 h-4 w-4" />
+                          <CheckCircle className="h-4 w-4 shrink-0 text-green-400" />
                         ) : active ? (
-                          <Loader2 className="text-racing-red-400 h-4 w-4 animate-spin" />
+                          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-racing-red-400" />
                         ) : (
-                          <Box sx={{ width: 16, height: 16, borderRadius: "50%", border: "1px solid #374151" }} />
+                          <Box className="h-4 w-4 shrink-0 rounded-full border border-gray-600" />
                         )}
                         <Typography
-                          variant="body2"
-                          sx={{
-                            color: done ? "#4ade80" : active ? "#f93943" : "#6b7280",
-                            textTransform: "capitalize",
-                          }}
+                          className={`text-sm capitalize ${
+                            done ? "text-green-400" : active ? "text-racing-red-400" : "text-gray-500"
+                          }`}
                         >
                           {stage.replace(/_/g, " ")}
                         </Typography>
@@ -302,25 +247,26 @@ export default function Onboarding({
           {/* Selection UI */}
           {!importing && (
             <>
-              <Box sx={{ textAlign: "center", mb: 6 }}>
-                <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+              <Box className="mb-6 text-center">
+                <Typography className="mb-1 text-3xl font-bold">
                   Welcome to F1 Telemetry
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: "auto" }}>
+                <Typography className="mx-auto max-w-125 text-gray-400">
                   Browse and import Formula 1 session data from the OpenF1 API to build your custom
                   telemetry dashboard.
                 </Typography>
               </Box>
 
               {/* Year dropdown */}
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-                <FormControl size="small" sx={{ minWidth: 160 }}>
+              <Box className="mb-4 flex justify-center">
+                <FormControl className="w-40">
                   <InputLabel id="year-label">Year</InputLabel>
                   <Select
                     labelId="year-label"
                     value={year}
                     label="Year"
                     onChange={(e) => setYear(e.target.value as number)}
+                    className="rounded-lg"
                   >
                     {years.map((y) => (
                       <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -330,10 +276,9 @@ export default function Onboarding({
               </Box>
 
               {/* GrandPrix Autocomplete */}
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
+              <Box className="mb-4 flex justify-center">
                 <Autocomplete
-                  size="medium"
-                  sx={{ width: 500 }}
+                  className="w-125 max-w-full"
                   value={selectedMeeting}
                   onChange={(_, newVal) => setSelectedMeeting(newVal)}
                   options={meetings}
@@ -354,10 +299,10 @@ export default function Onboarding({
                     return (
                       <Box component="li" key={option.meeting_key} {...rest}>
                         <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          <Typography className="text-sm font-semibold">
                             {option.country_name || option.meeting_name}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography className="text-xs text-gray-500">
                             {option.circuit_short_name || option.location}
                           </Typography>
                         </Box>
@@ -369,8 +314,8 @@ export default function Onboarding({
               </Box>
 
               {/* Sessions dropdown */}
-              <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-                <FormControl size="medium" sx={{ width: 500 }}>
+              <Box className="mb-4 flex justify-center">
+                <FormControl className="w-125 max-w-full">
                   <InputLabel id="session-label">Session</InputLabel>
                   <Select
                     labelId="session-label"
@@ -380,13 +325,13 @@ export default function Onboarding({
                     onChange={(e) => setSelectedSession(e.target.value as number)}
                     renderValue={(val) => {
                       const s = sessions.find((s) => s.session_key === val);
-                      if (!s) return <Typography color="text.secondary">Select a session</Typography>;
+                      if (!s) return <Typography className="text-gray-500">Select a session</Typography>;
                       return (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box className="flex items-center gap-2">
                           {getSessionTypeIcon(s.session_type)}
                           <Box>
-                            <Typography variant="body2">{s.session_name}</Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography className="text-sm">{s.session_name}</Typography>
+                            <Typography className="text-xs text-gray-500">
                               {s.session_type} • {new Date(s.date_start).toLocaleDateString()}
                             </Typography>
                           </Box>
@@ -396,7 +341,7 @@ export default function Onboarding({
                   >
                     {loadingSessions ? (
                       <MenuItem disabled>
-                        <CircularProgress size={16} sx={{ mr: 1 }} />
+                        <CircularProgress className="mr-1 h-4 w-4" />
                         Loading sessions...
                       </MenuItem>
                     ) : sessions.length === 0 ? (
@@ -404,11 +349,11 @@ export default function Onboarding({
                     ) : (
                       sessions.map((s) => (
                         <MenuItem key={s.session_key} value={s.session_key}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Box className="flex items-center gap-2">
                             {getSessionTypeIcon(s.session_type)}
                             <Box>
-                              <Typography variant="body2">{s.session_name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography className="text-sm">{s.session_name}</Typography>
+                              <Typography className="text-xs text-gray-500">
                                 {s.session_type} • {new Date(s.date_start).toLocaleDateString()}
                               </Typography>
                             </Box>
@@ -421,35 +366,22 @@ export default function Onboarding({
               </Box>
 
               {/* Action Buttons */}
-              <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 5 }}>
+              <Box className="mt-5 flex justify-center gap-3">
                 <Button
-                  className="cursor-pointer"
                   variant="contained"
                   disabled={!selectedMeeting || !selectedSession}
                   onClick={handleImport}
-                  sx={{
-                    bgcolor: "#c60610",
-                    "&:hover": { bgcolor: "#f70814" },
-                    px: 4, py: 1.5, borderRadius: 2,
-                    textTransform: "none", fontWeight: 600,
-                  }}
+                  className="cursor-pointer rounded-lg bg-racing-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-racing-red-500 disabled:opacity-50"
                 >
                   Import Data
                 </Button>
                 <Button
-                  className="cursor-pointer"
                   variant="outlined"
                   disabled={!selectedSession}
                   onClick={() => onSelectSession(selectedSession!)}
-                  endIcon={<ChevronRight className="h-4 w-4" />}
-                  sx={{
-                    borderColor: "#374151", color: "#d1d5db",
-                    "&:hover": { borderColor: "#6b7280", bgcolor: "rgba(255,255,255,0.05)" },
-                    px: 4, py: 1.5, borderRadius: 2,
-                    textTransform: "none", fontWeight: 600,
-                  }}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
                 >
-                  Browse (Already Imported)
+                  Browse (Already Imported) <ChevronRight className="h-4 w-4" />
                 </Button>
               </Box>
             </>
@@ -459,3 +391,5 @@ export default function Onboarding({
     </ThemeProvider>
   );
 }
+
+export default Onboarding;

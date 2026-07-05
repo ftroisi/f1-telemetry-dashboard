@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { Box, Typography } from "@mui/material";
 import { getCarData, getLaps, CarDataPoint, Lap } from "../../api/client";
 import { Loader2, AlertCircle } from "lucide-react";
 
@@ -20,13 +21,11 @@ interface SpeedTraceWidgetProps {
   onConfigure?: () => void;
 }
 
-export default function SpeedTraceWidget({
+const SpeedTraceWidget = ({
   sessionKey,
   driverNumbers,
   lapNumber,
-  configurable,
-  onConfigure
-}: SpeedTraceWidgetProps) {
+}: SpeedTraceWidgetProps) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,10 +42,8 @@ export default function SpeedTraceWidget({
       try {
         const driverNum = driverNumbers[0];
 
-        // Fetch car data for this driver
         const carData: CarDataPoint[] = await getCarData(sessionKey, driverNum);
 
-        // If we have a lap number, filter to that lap's time range using lap data
         if (lapNumber) {
           const laps: Lap[] = await getLaps(sessionKey, driverNum);
           const targetLap = laps.find((l) => l.lap_number === lapNumber);
@@ -78,28 +75,28 @@ export default function SpeedTraceWidget({
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
+      <Box className="flex h-full items-center justify-center">
+        <Box className="text-center">
           <AlertCircle className="mx-auto mb-2 h-6 w-6 text-red-400" />
-          <p className="text-xs text-red-300">{error}</p>
-        </div>
-      </div>
+          <Typography className="text-xs text-red-300">{error}</Typography>
+        </Box>
+      </Box>
     );
   }
 
   if (data.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-gray-500">No car data available</p>
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Typography className="text-sm text-gray-500">No car data available</Typography>
+      </Box>
     );
   }
 
@@ -165,3 +162,5 @@ export default function SpeedTraceWidget({
     </ResponsiveContainer>
   );
 }
+
+export default SpeedTraceWidget;

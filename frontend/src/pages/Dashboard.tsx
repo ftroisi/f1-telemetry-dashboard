@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import GridLayout from "react-grid-layout";
+import { Button, Box, Typography, ThemeProvider, createTheme } from "@mui/material";
 import { getDrivers, Driver } from "../api/client";
 import {
   WidgetConfig,
@@ -17,12 +18,22 @@ import RacePositionsWidget from "../components/widgets/RacePositionsWidget";
 import WidgetConfigPanel from "../components/WidgetConfigPanel";
 import { Settings, ArrowLeft, Plus, GripVertical } from "lucide-react";
 
+const f1Theme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: { main: "#f70814" },
+    background: { default: "#0f1115", paper: "#161b22" },
+    text: { primary: "#ffffff", secondary: "#9ca3af" },
+    divider: "rgba(255,255,255,0.08)",
+  },
+});
+
 interface DashboardProps {
   sessionKey: number;
   onBackToHome: () => void;
 }
 
-export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) {
+const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [widgets, setWidgets] = useState<WidgetConfig[]>([]);
   const [layouts, setLayouts] = useState<LayoutItem[]>([]);
@@ -36,7 +47,6 @@ export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) 
         const driverList = await getDrivers(sessionKey);
         setDrivers(driverList || []);
 
-        // Load or initialize dashboard state
         const saved = loadDashboardState(sessionKey);
         if (saved && saved.widgets.length > 0) {
           setWidgets(saved.widgets);
@@ -128,9 +138,9 @@ export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) 
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0f1115]">
-        <div className="border-racing-red-500 h-12 w-12 animate-spin rounded-full border-b-2"></div>
-      </div>
+      <Box className="flex min-h-screen items-center justify-center bg-[#0f1115]">
+        <Box className="h-12 w-12 animate-spin rounded-full border-b-2 border-racing-red-500" />
+      </Box>
     );
   }
 
@@ -142,123 +152,130 @@ export default function Dashboard({ sessionKey, onBackToHome }: DashboardProps) 
   }));
 
   return (
-    <div className="min-h-screen bg-[#0f1115]">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-gray-800 px-6 py-3">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBackToHome}
-            className="text-gray-400 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="bg-racing-red-600 flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
-            F1
-          </div>
-          <h1 className="text-lg font-bold">Dashboard</h1>
-          <span className="text-sm text-gray-500">Session #{sessionKey}</span>
-        </div>
+    <ThemeProvider theme={f1Theme}>
+      <Box className="w-full h-full bg-[#0f1115]">
+        {/* Header */}
+        <Box component="header" className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-6 py-3">
+          <Box className="flex items-center gap-4">
+            <button
+              onClick={onBackToHome}
+              className="text-gray-400 transition-colors hover:text-white"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <Box className="flex h-8 w-8 items-center justify-center rounded-lg bg-racing-red-600 text-sm font-bold">
+              F1
+            </Box>
+            <Typography className="text-lg font-bold">Dashboard</Typography>
+            <Typography className="text-sm text-gray-500">Session #{sessionKey}</Typography>
+          </Box>
 
-        {/* Add Widget Dropdown */}
-        <div className="group relative">
-          <button className="bg-racing-red-600 hover:bg-racing-red-500 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all">
-            <Plus className="h-4 w-4" />
-            Add Widget
-          </button>
-          <div className="invisible absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-800 bg-[#161b22] opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-            {(
-              [
-                { type: "speed-trace", label: "Speed / Throttle / Brake" },
-                { type: "sector-times", label: "Sector Time Comparison" },
-                { type: "track-map", label: "Track Position Map" },
-                { type: "pit-stops", label: "Pit Stop Duration" },
-                { type: "race-positions", label: "Race Position Changes" }
-              ] as const
-            ).map(({ type, label }) => (
-              <button
-                key={type}
-                onClick={() => handleAddWidget(type)}
-                className="w-full px-4 py-2.5 text-left text-sm text-gray-300 first:rounded-t-lg last:rounded-b-lg hover:bg-gray-800 hover:text-white"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
+          {/* Add Widget Dropdown */}
+          <Box className="group relative">
+            <Button
+              variant="contained"
+              className="flex items-center gap-2 rounded-lg bg-racing-red-600 px-4 py-2 text-sm font-medium transition-all hover:bg-racing-red-500"
+            >
+              <Plus className="h-4 w-4" />
+              Add Widget
+            </Button>
+            <Box className="invisible absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-gray-800 bg-[#161b22] opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+              {(
+                [
+                  { type: "speed-trace" as const, label: "Speed / Throttle / Brake" },
+                  { type: "sector-times" as const, label: "Sector Time Comparison" },
+                  { type: "track-map" as const, label: "Track Position Map" },
+                  { type: "pit-stops" as const, label: "Pit Stop Duration" },
+                  { type: "race-positions" as const, label: "Race Position Changes" }
+                ]
+              ).map(({ type, label }) => (
+                <button
+                  key={type}
+                  onClick={() => handleAddWidget(type)}
+                  className="w-full px-4 py-2.5 text-left text-sm text-gray-300 first:rounded-t-lg last:rounded-b-lg hover:bg-gray-800 hover:text-white"
+                >
+                  {label}
+                </button>
+              ))}
+            </Box>
+          </Box>
+        </Box>
 
-      <main className="p-6">
-        {widgets.length === 0 ? (
-          <div className="py-24 text-center">
-            <p className="mb-4 text-lg text-gray-500">No widgets yet</p>
-            <p className="text-sm text-gray-600">Add widgets using the button in the header</p>
-          </div>
-        ) : (
-          <GridLayout
-            className="layout"
-            layout={gridLayout}
-            width={1200}
-            onLayoutChange={handleLayoutChange}
-            gridConfig={{ cols: 12, rowHeight: 100, margin: [16, 16], containerPadding: [0, 0] }}
-            dragConfig={{ handle: ".drag-handle" }}
-          >
-            {widgets.map((widget) => (
-              <div
-                key={widget.id}
-                className="group overflow-hidden rounded-xl border border-gray-800 bg-[#161b22]"
-              >
-                <div className="flex items-center justify-between border-b border-gray-800 bg-[#1a1a2e] px-4 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <div className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
-                      <GripVertical className="h-4 w-4" />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-200">{widget.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setConfiguringWidget(widget.id)}
-                      className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-white"
-                      title="Configure"
-                    >
-                      <Settings className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleRemoveWidget(widget.id)}
-                      className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-red-400"
-                      title="Remove"
-                    >
-                      <svg
-                        className="h-3.5 w-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+        <Box component="main" className="p-6">
+          {widgets.length === 0 ? (
+            <Box className="py-24 text-center">
+              <Typography className="mb-4 text-lg text-gray-500">No widgets yet</Typography>
+              <Typography className="text-sm text-gray-600">Add widgets using the button in the header</Typography>
+            </Box>
+          ) : (
+            <GridLayout
+              className="layout"
+              layout={gridLayout}
+              width={1200}
+              onLayoutChange={handleLayoutChange}
+              gridConfig={{ cols: 12, rowHeight: 100, margin: [16, 16], containerPadding: [0, 0] }}
+              dragConfig={{ handle: ".drag-handle" }}
+            >
+              {widgets.map((widget) => (
+                <Box
+                  key={widget.id}
+                  className="group overflow-hidden rounded-xl border border-gray-800 bg-[#161b22]"
+                >
+                  <Box className="flex items-center justify-between border-b border-gray-800 bg-[#1a1a2e] px-4 py-2.5">
+                    <Box className="flex items-center gap-2">
+                      <Box className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
+                        <GripVertical className="h-4 w-4" />
+                      </Box>
+                      <Typography className="text-sm font-medium text-gray-200">{widget.title}</Typography>
+                    </Box>
+                    <Box className="flex items-center gap-1">
+                      <button
+                        onClick={() => setConfiguringWidget(widget.id)}
+                        className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-white"
+                        title="Configure"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</div>
-              </div>
-            ))}
-          </GridLayout>
-        )}
-      </main>
+                        <Settings className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleRemoveWidget(widget.id)}
+                        className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-red-400"
+                        title="Remove"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </Box>
+                  </Box>
+                  <Box className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</Box>
+                </Box>
+              ))}
+            </GridLayout>
+          )}
+        </Box>
 
-      {/* Config Panel Modal */}
-      {configuringWidget && (
-        <WidgetConfigPanel
-          widget={widgets.find((w) => w.id === configuringWidget)!}
-          drivers={drivers}
-          onUpdate={(config) => handleUpdateWidget(configuringWidget, config)}
-          onClose={() => setConfiguringWidget(null)}
-        />
-      )}
-    </div>
+        {/* Config Panel Modal */}
+        {configuringWidget && (
+          <WidgetConfigPanel
+            widget={widgets.find((w) => w.id === configuringWidget)!}
+            drivers={drivers}
+            onUpdate={(config) => handleUpdateWidget(configuringWidget, config)}
+            onClose={() => setConfiguringWidget(null)}
+          />
+        )}
+      </Box>
+    </ThemeProvider>
   );
 }
+
+export default Dashboard;

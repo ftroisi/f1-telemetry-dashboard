@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { Box, Typography } from "@mui/material";
 import { getPositions, getDrivers, Position, Driver } from "../../api/client";
 import { Loader2, AlertCircle } from "lucide-react";
 
@@ -19,10 +20,10 @@ interface RacePositionsWidgetProps {
   onConfigure?: () => void;
 }
 
-export default function RacePositionsWidget({
+const RacePositionsWidget = ({
   sessionKey,
   driverNumbers
-}: RacePositionsWidgetProps) {
+}: RacePositionsWidgetProps) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,22 +49,18 @@ export default function RacePositionsWidget({
 
         const nums = driverNumbers.length > 0 ? driverNumbers : drivers.map((d) => d.driver_number);
 
-        // Fetch positions for all selected drivers
         const allPositionData: Map<number, Position[]> = new Map();
         for (const dn of nums) {
           const positions = await getPositions(sessionKey, dn);
           allPositionData.set(dn, positions);
         }
 
-        // Build a time-synced dataset using date as index
-        // Find common time points or use sample by lap
         const timeMap = new Map<string, any>();
 
         allPositionData.forEach((positions, dn) => {
           const driver = driverMap.get(dn);
           const acronym = driver?.name_acronym || `#${dn}`;
 
-          // Sample every ~10th position reading to avoid too many points
           const step = Math.max(1, Math.floor(positions.length / 50));
 
           positions.forEach((pos, idx) => {
@@ -76,7 +73,6 @@ export default function RacePositionsWidget({
           });
         });
 
-        // Sort by time and take reasonable number of points
         const sortedData = Array.from(timeMap.values())
           .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
           .slice(0, 200);
@@ -93,32 +89,31 @@ export default function RacePositionsWidget({
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
+      <Box className="flex h-full items-center justify-center">
+        <Box className="text-center">
           <AlertCircle className="mx-auto mb-2 h-6 w-6 text-red-400" />
-          <p className="text-xs text-red-300">{error}</p>
-        </div>
-      </div>
+          <Typography className="text-xs text-red-300">{error}</Typography>
+        </Box>
+      </Box>
     );
   }
 
   if (data.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-gray-500">No position data available</p>
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Typography className="text-sm text-gray-500">No position data available</Typography>
+      </Box>
     );
   }
 
-  // Get all driver acronyms from the data keys (excluding 'time')
   const driverKeys = Object.keys(data[0] || {}).filter((k) => k !== "time");
   const reversedData = data.map((d) => ({
     ...d,
@@ -185,3 +180,5 @@ export default function RacePositionsWidget({
     </ResponsiveContainer>
   );
 }
+
+export default RacePositionsWidget;

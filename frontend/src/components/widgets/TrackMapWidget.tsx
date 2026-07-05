@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   ScatterChart,
   Scatter,
@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
+import { Box, Typography } from "@mui/material";
 import { getLocationData } from "../../api/client";
 import { Loader2, AlertCircle } from "lucide-react";
 
@@ -19,7 +20,7 @@ interface TrackMapWidgetProps {
   onConfigure?: () => void;
 }
 
-export default function TrackMapWidget({ sessionKey, driverNumbers }: TrackMapWidgetProps) {
+const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
   const [scatterData, setScatterData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +57,6 @@ export default function TrackMapWidget({ sessionKey, driverNumbers }: TrackMapWi
           })
         );
 
-        // Recharts ScatterChart needs data in a specific format
         const series = allData
           .filter((s) => s.data.length > 0)
           .map((s) => ({
@@ -77,28 +77,28 @@ export default function TrackMapWidget({ sessionKey, driverNumbers }: TrackMapWi
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
+      <Box className="flex h-full items-center justify-center">
+        <Box className="text-center">
           <AlertCircle className="mx-auto mb-2 h-6 w-6 text-red-400" />
-          <p className="text-xs text-red-300">{error}</p>
-        </div>
-      </div>
+          <Typography className="text-xs text-red-300">{error}</Typography>
+        </Box>
+      </Box>
     );
   }
 
   if (scatterData.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-gray-500">No track position data available</p>
-      </div>
+      <Box className="flex h-full items-center justify-center">
+        <Typography className="text-sm text-gray-500">No track position data available</Typography>
+      </Box>
     );
   }
 
@@ -132,3 +132,5 @@ export default function TrackMapWidget({ sessionKey, driverNumbers }: TrackMapWi
     </ResponsiveContainer>
   );
 }
+
+export default TrackMapWidget;
