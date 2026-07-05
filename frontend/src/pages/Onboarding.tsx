@@ -121,9 +121,10 @@ export default function Onboarding({
     async function fetchMeetings() {
       setLoadingMeetings(true);
       try {
-        const data = await getMeetings(year);
+        const meetingsData = await getMeetings(year);
+        console.log("Fetched meetings:", meetingsData);
         if (!cancelled) {
-          setMeetings(data || []);
+          setMeetings(meetingsData || []);
           setSelectedMeeting(null);
           setSessions([]);
           setSelectedSession(null);
@@ -149,8 +150,8 @@ export default function Onboarding({
     async function fetchSessions() {
       setLoadingSessions(true);
       try {
-        const data = await getSessions(selectedMeeting!.meeting_key);
-        if (!cancelled) setSessions(data || []);
+        const sessionsData = await getSessions(selectedMeeting!.meeting_key);
+        if (!cancelled) setSessions(sessionsData || []);
       } catch (err: any) {
         if (!cancelled) toast.error(err.message || "Failed to fetch sessions");
       } finally {
@@ -346,23 +347,12 @@ export default function Onboarding({
                       {...params}
                       label="Grand Prix"
                       placeholder="Search for a Grand Prix..."
-                      slotProps={{
-                        input: {
-                          ...params.slotProps?.input,
-                          endAdornment: (
-                            <>
-                              {loadingMeetings ? <CircularProgress color="inherit" size={20} /> : null}
-                              {params.slotProps?.input?.endAdornment}
-                            </>
-                          ),
-                        },
-                      }}
                     />
                   )}
                   renderOption={(props, option) => {
                     const { key, ...rest } = props;
                     return (
-                      <Box component="li" key={key} {...rest}>
+                      <Box component="li" key={option.meeting_key} {...rest}>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {option.country_name || option.meeting_name}
@@ -433,6 +423,7 @@ export default function Onboarding({
               {/* Action Buttons */}
               <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 5 }}>
                 <Button
+                  className="cursor-pointer"
                   variant="contained"
                   disabled={!selectedMeeting || !selectedSession}
                   onClick={handleImport}
@@ -446,6 +437,7 @@ export default function Onboarding({
                   Import Data
                 </Button>
                 <Button
+                  className="cursor-pointer"
                   variant="outlined"
                   disabled={!selectedSession}
                   onClick={() => onSelectSession(selectedSession!)}

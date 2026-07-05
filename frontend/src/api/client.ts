@@ -21,7 +21,7 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return res.data as T;
 }
 
-export interface Meeting {
+export type Meeting = {
   meeting_key: number;
   year: number;
   country_name: string;
@@ -33,7 +33,7 @@ export interface Meeting {
   location?: string;
 }
 
-export interface Session {
+export type Session = {
   session_key: number;
   meeting_key: number;
   session_name: string;
@@ -43,7 +43,7 @@ export interface Session {
   year?: number;
 }
 
-export interface Driver {
+export type Driver = {
   session_key: number;
   driver_number: number;
   full_name: string;
@@ -54,7 +54,7 @@ export interface Driver {
   country_code?: string;
 }
 
-export interface Lap {
+export type Lap = {
   session_key: number;
   driver_number: number;
   lap_number: number;
@@ -72,7 +72,7 @@ export interface Lap {
   date_start?: string;
 }
 
-export interface CarDataPoint {
+export type CarDataPoint = {
   id?: number;
   session_key: number;
   driver_number: number;
@@ -85,14 +85,14 @@ export interface CarDataPoint {
   drs: number;
 }
 
-export interface Position {
+export type Position = {
   session_key: number;
   driver_number: number;
   date: string;
   position: number;
 }
 
-export interface PitStop {
+export type PitStop = {
   session_key: number;
   driver_number: number;
   lap_number: number;
@@ -101,7 +101,7 @@ export interface PitStop {
   date?: string;
 }
 
-export interface ImportProgress {
+export type ImportProgress = {
   status: "pending" | "running" | "complete" | "error" | "idle";
   stage: string;
   progress: number;
