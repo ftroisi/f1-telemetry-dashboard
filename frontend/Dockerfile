@@ -22,7 +22,7 @@ RUN pnpm run build
 # ---- Production Stage (Nginx) ----
 FROM nginx:alpine3.23 AS production
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/nginx/html
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
