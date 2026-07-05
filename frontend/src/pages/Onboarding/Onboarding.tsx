@@ -1,22 +1,10 @@
 import { useState, useEffect } from "react";
 import { getMeetings, getSessions, triggerImport, getImportStatus } from "../../api/client";
-import { Box, Typography, createTheme, ThemeProvider } from "@mui/material";
 import { toast } from "react-toastify";
 import { ImportProgress, Meeting, Session } from "../../types/onboardingTypes";
+import { OnboardingContext } from "./OnboardingContext";
 import DataImportUI from "./DataImportUI";
 import EventSelectionUI from "./EventSelectionUI";
-
-// Dark F1 theme for MUI components (kept for component-level overrides)
-const f1Theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: { main: "#f70814" },
-    secondary: { main: "#1ca7e3" },
-    background: { default: "#0f1115", paper: "#161b22" },
-    text: { primary: "#ffffff", secondary: "#9ca3af" },
-    divider: "rgba(255,255,255,0.08)"
-  }
-});
 
 interface OnboardingProps {
   onImportComplete: (sessionKey: number) => void;
@@ -124,28 +112,27 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     }
   };
 
+  const contextValue = {
+    meetings,
+    sessions,
+    selectedMeeting,
+    selectedSession,
+    year,
+    loadingMeetings,
+    loadingSessions,
+    importProgress,
+    importing,
+    setSelectedMeeting,
+    setSelectedSession,
+    setYear,
+    handleImport,
+    onSelectSession
+  };
+
   return (
-    <ThemeProvider theme={f1Theme}>
-      <Box className="flex h-full w-full flex-col items-center bg-[#0f1115]">
-        {/* Header */}
-        <Box component="header" className="border-b border-[rgba(255,255,255,0.08)] px-6 py-4">
-          <Box className="mx-auto flex max-w-180 items-center gap-3">
-            <Box className="bg-racing-red-600 flex h-9 w-9 items-center justify-center rounded text-sm font-bold">
-              F1
-            </Box>
-            <Typography className="text-lg font-bold">F1 Telemetry Dashboard</Typography>
-          </Box>
-        </Box>
-
-        <Box className="mx-auto max-w-180 px-6 py-6">
-          {/* Import Progress View */}
-          {importing && importProgress && <DataImportUI importProgress={importProgress} />}
-
-          {/* Selection UI */}
-          {!importing && <EventSelectionUI handleImport={handleImport} />}
-        </Box>
-      </Box>
-    </ThemeProvider>
+    <OnboardingContext.Provider value={contextValue}>
+      {importing && importProgress ? <DataImportUI /> : <EventSelectionUI />}
+    </OnboardingContext.Provider>
   );
 };
 

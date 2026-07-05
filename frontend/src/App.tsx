@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import Onboarding from "./pages/Onboarding/Onboarding";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import { LayoutProvider } from "./components/layout/LayoutContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -20,11 +23,6 @@ function App() {
       try {
         const health = await checkHealth();
         setHasData(health.has_data);
-
-        // If there's data but no session key stored, try to get one
-        if (health.has_data && !sessionKey) {
-          // We'll let the onboarding handle this
-        }
       } catch {
         setHasData(false);
       } finally {
@@ -61,8 +59,10 @@ function App() {
     );
   }
 
+  const isDashboardView = !!hasData && !!sessionKey;
+
   return (
-    <>
+    <LayoutProvider>
       <ToastContainer
         position="top-right"
         autoClose={4000}
@@ -72,18 +72,22 @@ function App() {
         pauseOnHover
         theme="dark"
       />
-      <Box className="h-full w-full bg-[#0f1115]">
-        {!hasData || !sessionKey ? (
-          <Onboarding
-            onImportComplete={handleImportComplete}
-            onSelectSession={handleSelectSession}
-            existingSessionKey={sessionKey}
-          />
-        ) : (
-          <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
-        )}
+      <Box className="flex min-h-screen flex-col bg-[#0f1115]">
+        <Navbar showBackButton={isDashboardView} onBack={handleBackToHome} />
+        <Box className="flex-1">
+          {!isDashboardView ? (
+            <Onboarding
+              onImportComplete={handleImportComplete}
+              onSelectSession={handleSelectSession}
+              existingSessionKey={sessionKey}
+            />
+          ) : (
+            <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
+          )}
+        </Box>
+        <Footer />
       </Box>
-    </>
+    </LayoutProvider>
   );
 }
 

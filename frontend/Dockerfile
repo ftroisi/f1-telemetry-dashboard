@@ -15,6 +15,7 @@ COPY frontend/pnpm-workspace.yaml ./
 RUN pnpm install
 
 COPY frontend/src/ ./src/
+COPY frontend/assets ./assets
 
 RUN pnpm run build
 

@@ -34,6 +34,7 @@
     "uuid": "^14.0.1"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/react-grid-layout": "^2.1.0",

@@ -1,16 +1,17 @@
 import { Box, Typography } from "@mui/material";
 import { CheckCircle, Loader2 } from "lucide-react";
-import { ImportProgress, STAGES } from "../../types/onboardingTypes";
+import { STAGES } from "../../types/onboardingTypes";
+import { useOnboardingContext } from "./OnboardingContext";
 
-interface DataImportUIProps {
-  importProgress: ImportProgress;
-}
+const DataImportUI = () => {
+  const { importProgress } = useOnboardingContext();
 
-const DataImportUI = ({ importProgress }: DataImportUIProps) => {
-  const currentStageIdx = importProgress ? STAGES.indexOf(importProgress.stage as any) : -1;
+  if (!importProgress) return null;
+
+  const currentStageIdx = STAGES.indexOf(importProgress.stage as any);
 
   return (
-    <Box className="mt-4 text-center">
+    <Box className="mx-auto max-w-180 px-6 py-6">
       <Box className="flex flex-col items-center justify-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#161b22] p-6">
         <Loader2 className="text-racing-red-500 mx-auto mb-4 h-12 w-12 animate-spin" />
         <Typography className="mb-1 text-xl font-bold">Importing Session Data</Typography>

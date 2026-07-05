@@ -4,7 +4,14 @@ RUN npm install -g pnpm@11
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY ./package.json ./
+COPY ./pnpm-lock.yaml ./
+COPY ./tsconfig.json ./
+COPY ./vite.config.ts ./
+COPY ./postcss.config.js ./
+COPY ./index.html ./
+COPY ./pnpm-workspace.yaml ./
+COPY ./assets ./assets
 
 RUN pnpm install
 

@@ -11,12 +11,24 @@ import {
   Typography
 } from "@mui/material";
 import { Activity, ChevronRight, Flag, Timer } from "lucide-react";
+import { useOnboardingContext } from "./OnboardingContext";
 
-interface EventSelectionUIProps {
-  handleImport: () => void;
-}
+const EventSelectionUI = () => {
+  const {
+    meetings,
+    sessions,
+    selectedMeeting,
+    selectedSession,
+    year,
+    loadingMeetings,
+    loadingSessions,
+    setSelectedMeeting,
+    setSelectedSession,
+    setYear,
+    handleImport,
+    onSelectSession
+  } = useOnboardingContext();
 
-const EventSelectionUI = ({ handleImport }: EventSelectionUIProps) => {
   const years = [2023, 2024, 2025, 2026] as const;
 
   const getSessionTypeIcon = (type: string) => {
@@ -31,7 +43,7 @@ const EventSelectionUI = ({ handleImport }: EventSelectionUIProps) => {
   };
 
   return (
-    <>
+    <Box className="mx-auto max-w-180 px-6 py-6">
       <Box className="mb-6 text-center">
         <Typography className="mb-1 text-3xl font-bold">Welcome to F1 Telemetry</Typography>
         <Typography className="mx-auto max-w-125 text-gray-400">
@@ -165,7 +177,7 @@ const EventSelectionUI = ({ handleImport }: EventSelectionUIProps) => {
           Browse (Already Imported) <ChevronRight className="h-4 w-4" />
         </Button>
       </Box>
-    </>
+    </Box>
   );
 };
 
