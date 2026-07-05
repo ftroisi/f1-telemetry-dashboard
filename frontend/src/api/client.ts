@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ImportProgress, Meeting, Session } from "../types/onboardingTypes";
 
 const apiClient = axios.create({
   baseURL: "/api",
@@ -21,28 +22,6 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return res.data as T;
 }
 
-export type Meeting = {
-  meeting_key: number;
-  year: number;
-  country_name: string;
-  circuit_short_name: string;
-  date_start: string;
-  date_end: string;
-  meeting_name?: string;
-  meeting_official_name?: string;
-  location?: string;
-}
-
-export type Session = {
-  session_key: number;
-  meeting_key: number;
-  session_name: string;
-  session_type: string;
-  date_start: string;
-  date_end: string;
-  year?: number;
-}
-
 export type Driver = {
   session_key: number;
   driver_number: number;
@@ -52,7 +31,7 @@ export type Driver = {
   team_colour: string;
   headshot_url: string;
   country_code?: string;
-}
+};
 
 export type Lap = {
   session_key: number;
@@ -70,7 +49,7 @@ export type Lap = {
   segment_2?: number;
   segment_3?: number;
   date_start?: string;
-}
+};
 
 export type CarDataPoint = {
   id?: number;
@@ -83,14 +62,14 @@ export type CarDataPoint = {
   rpm: number;
   n_gear: number;
   drs: number;
-}
+};
 
 export type Position = {
   session_key: number;
   driver_number: number;
   date: string;
   position: number;
-}
+};
 
 export type PitStop = {
   session_key: number;
@@ -99,15 +78,7 @@ export type PitStop = {
   pit_duration: number;
   stop_duration: number;
   date?: string;
-}
-
-export type ImportProgress = {
-  status: "pending" | "running" | "complete" | "error" | "idle";
-  stage: string;
-  progress: number;
-  message: string;
-  error?: string;
-}
+};
 
 export async function checkHealth(): Promise<{ has_data: boolean; session_count: number }> {
   return apiGet("/health");

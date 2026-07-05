@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import Onboarding from "./pages/Onboarding";
+import Onboarding from "./pages/Onboarding/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { checkHealth } from "./api/client";
+import Box from "@mui/material/Box";
 
 function App() {
   const [hasData, setHasData] = useState<boolean | null>(null);
@@ -71,15 +72,17 @@ function App() {
         pauseOnHover
         theme="dark"
       />
-      {!hasData || !sessionKey ? (
-        <Onboarding
-          onImportComplete={handleImportComplete}
-          onSelectSession={handleSelectSession}
-          existingSessionKey={sessionKey}
-        />
-      ) : (
-        <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
-      )}
+      <Box className="h-full w-full bg-[#0f1115]">
+        {!hasData || !sessionKey ? (
+          <Onboarding
+            onImportComplete={handleImportComplete}
+            onSelectSession={handleSelectSession}
+            existingSessionKey={sessionKey}
+          />
+        ) : (
+          <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
+        )}
+      </Box>
     </>
   );
 }

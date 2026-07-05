@@ -19,12 +19,7 @@ const WIDGET_TYPES: { type: WidgetConfig["type"]; label: string }[] = [
   { type: "race-positions", label: "Race Position Changes" }
 ];
 
-const WidgetConfigPanel = ({
-  widget,
-  drivers,
-  onUpdate,
-  onClose
-}: WidgetConfigPanelProps) => {
+const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigPanelProps) => {
   const [selectedDrivers, setSelectedDrivers] = useState<number[]>(widget.driverNumbers);
   const [title, setTitle] = useState(widget.title);
 
@@ -61,7 +56,9 @@ const WidgetConfigPanel = ({
         <Box className="space-y-5 p-5">
           {/* Title */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">Widget Title</Typography>
+            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+              Widget Title
+            </Typography>
             <TextField
               type="text"
               value={title}
@@ -74,7 +71,9 @@ const WidgetConfigPanel = ({
 
           {/* Widget Type (read-only) */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">Widget Type</Typography>
+            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+              Widget Type
+            </Typography>
             <Box className="rounded-lg border border-gray-700 bg-[#0f1115] px-3 py-2 text-sm text-gray-300">
               {WIDGET_TYPES.find((t) => t.type === widget.type)?.label || widget.type}
             </Box>
@@ -82,7 +81,9 @@ const WidgetConfigPanel = ({
 
           {/* Driver Selection */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">Drivers</Typography>
+            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+              Drivers
+            </Typography>
             <Box className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-700 bg-[#0f1115] p-2">
               {drivers.map((driver) => (
                 <label
@@ -93,7 +94,7 @@ const WidgetConfigPanel = ({
                     type="checkbox"
                     checked={selectedDrivers.includes(driver.driver_number)}
                     onChange={() => toggleDriver(driver.driver_number)}
-                    className="rounded border-gray-600 bg-gray-800 text-racing-red-500 focus:ring-racing-red-500"
+                    className="text-racing-red-500 focus:ring-racing-red-500 rounded border-gray-600 bg-gray-800"
                   />
                   <Box
                     className="h-3 w-3 rounded-full"
@@ -103,7 +104,9 @@ const WidgetConfigPanel = ({
                   />
                   <Box>
                     <Typography className="text-sm text-gray-200">{driver.name_acronym}</Typography>
-                    <Typography className="ml-2 text-xs text-gray-500">{driver.full_name}</Typography>
+                    <Typography className="ml-2 text-xs text-gray-500">
+                      {driver.full_name}
+                    </Typography>
                   </Box>
                 </label>
               ))}
@@ -142,7 +145,7 @@ const WidgetConfigPanel = ({
           <Button
             onClick={handleSave}
             variant="contained"
-            className="rounded-lg bg-racing-red-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-racing-red-500"
+            className="bg-racing-red-600 hover:bg-racing-red-500 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all"
           >
             Save
           </Button>
@@ -150,6 +153,6 @@ const WidgetConfigPanel = ({
       </Box>
     </Box>
   );
-}
+};
 
 export default WidgetConfigPanel;

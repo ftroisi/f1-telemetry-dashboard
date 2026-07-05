@@ -21,11 +21,7 @@ interface SpeedTraceWidgetProps {
   onConfigure?: () => void;
 }
 
-const SpeedTraceWidget = ({
-  sessionKey,
-  driverNumbers,
-  lapNumber,
-}: SpeedTraceWidgetProps) => {
+const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWidgetProps) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +72,7 @@ const SpeedTraceWidget = ({
   if (loading) {
     return (
       <Box className="flex h-full items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
       </Box>
     );
   }
@@ -161,6 +157,6 @@ const SpeedTraceWidget = ({
       </LineChart>
     </ResponsiveContainer>
   );
-}
+};
 
 export default SpeedTraceWidget;

@@ -24,8 +24,8 @@ const f1Theme = createTheme({
     primary: { main: "#f70814" },
     background: { default: "#0f1115", paper: "#161b22" },
     text: { primary: "#ffffff", secondary: "#9ca3af" },
-    divider: "rgba(255,255,255,0.08)",
-  },
+    divider: "rgba(255,255,255,0.08)"
+  }
 });
 
 interface DashboardProps {
@@ -139,7 +139,7 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
   if (loading) {
     return (
       <Box className="flex min-h-screen items-center justify-center bg-[#0f1115]">
-        <Box className="h-12 w-12 animate-spin rounded-full border-b-2 border-racing-red-500" />
+        <Box className="border-racing-red-500 h-12 w-12 animate-spin rounded-full border-b-2" />
       </Box>
     );
   }
@@ -153,9 +153,12 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
 
   return (
     <ThemeProvider theme={f1Theme}>
-      <Box className="w-full h-full bg-[#0f1115]">
+      <Box className="h-full w-full">
         {/* Header */}
-        <Box component="header" className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-6 py-3">
+        <Box
+          component="header"
+          className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-6 py-3"
+        >
           <Box className="flex items-center gap-4">
             <button
               onClick={onBackToHome}
@@ -163,7 +166,7 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <Box className="flex h-8 w-8 items-center justify-center rounded-lg bg-racing-red-600 text-sm font-bold">
+            <Box className="bg-racing-red-600 flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold">
               F1
             </Box>
             <Typography className="text-lg font-bold">Dashboard</Typography>
@@ -174,21 +177,19 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
           <Box className="group relative">
             <Button
               variant="contained"
-              className="flex items-center gap-2 rounded-lg bg-racing-red-600 px-4 py-2 text-sm font-medium transition-all hover:bg-racing-red-500"
+              className="bg-racing-red-600 hover:bg-racing-red-500 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
             >
               <Plus className="h-4 w-4" />
               Add Widget
             </Button>
-            <Box className="invisible absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-gray-800 bg-[#161b22] opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-              {(
-                [
-                  { type: "speed-trace" as const, label: "Speed / Throttle / Brake" },
-                  { type: "sector-times" as const, label: "Sector Time Comparison" },
-                  { type: "track-map" as const, label: "Track Position Map" },
-                  { type: "pit-stops" as const, label: "Pit Stop Duration" },
-                  { type: "race-positions" as const, label: "Race Position Changes" }
-                ]
-              ).map(({ type, label }) => (
+            <Box className="invisible absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-800 bg-[#161b22] opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+              {[
+                { type: "speed-trace" as const, label: "Speed / Throttle / Brake" },
+                { type: "sector-times" as const, label: "Sector Time Comparison" },
+                { type: "track-map" as const, label: "Track Position Map" },
+                { type: "pit-stops" as const, label: "Pit Stop Duration" },
+                { type: "race-positions" as const, label: "Race Position Changes" }
+              ].map(({ type, label }) => (
                 <button
                   key={type}
                   onClick={() => handleAddWidget(type)}
@@ -205,7 +206,9 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
           {widgets.length === 0 ? (
             <Box className="py-24 text-center">
               <Typography className="mb-4 text-lg text-gray-500">No widgets yet</Typography>
-              <Typography className="text-sm text-gray-600">Add widgets using the button in the header</Typography>
+              <Typography className="text-sm text-gray-600">
+                Add widgets using the button in the header
+              </Typography>
             </Box>
           ) : (
             <GridLayout
@@ -226,7 +229,9 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
                       <Box className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
                         <GripVertical className="h-4 w-4" />
                       </Box>
-                      <Typography className="text-sm font-medium text-gray-200">{widget.title}</Typography>
+                      <Typography className="text-sm font-medium text-gray-200">
+                        {widget.title}
+                      </Typography>
                     </Box>
                     <Box className="flex items-center gap-1">
                       <button
@@ -276,6 +281,6 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
       </Box>
     </ThemeProvider>
   );
-}
+};
 
 export default Dashboard;

@@ -20,10 +20,7 @@ interface RacePositionsWidgetProps {
   onConfigure?: () => void;
 }
 
-const RacePositionsWidget = ({
-  sessionKey,
-  driverNumbers
-}: RacePositionsWidgetProps) => {
+const RacePositionsWidget = ({ sessionKey, driverNumbers }: RacePositionsWidgetProps) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +87,7 @@ const RacePositionsWidget = ({
   if (loading) {
     return (
       <Box className="flex h-full items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
       </Box>
     );
   }
@@ -179,6 +176,6 @@ const RacePositionsWidget = ({
       </LineChart>
     </ResponsiveContainer>
   );
-}
+};
 
 export default RacePositionsWidget;

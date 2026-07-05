@@ -83,7 +83,7 @@ const PitStopsWidget = ({ sessionKey, driverNumbers }: PitStopsWidgetProps) => {
   if (loading) {
     return (
       <Box className="flex h-full items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-racing-red-500" />
+        <Loader2 className="text-racing-red-500 h-6 w-6 animate-spin" />
       </Box>
     );
   }
@@ -142,6 +142,6 @@ const PitStopsWidget = ({ sessionKey, driverNumbers }: PitStopsWidgetProps) => {
       </BarChart>
     </ResponsiveContainer>
   );
-}
+};
 
 export default PitStopsWidget;
