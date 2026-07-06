@@ -221,19 +221,20 @@ async function runImport(
   await insertRaceControlBatch(rcList);
 
   // Step 9: Fetch and store location data
-  for (let i = 0; i < driverNumbers.length; i++) {
-    const dn = driverNumbers[i];
-    const driverProgress = 88 + ((i + 1) / driverNumbers.length) * 10;
-    const locData = await fetchWithProgress(
-      sessionKey,
-      "fetching_location",
-      Math.round(driverProgress),
-      () => fetchLocation(sessionKey, dn),
-      importId,
-    );
-    const locList = Array.isArray(locData) ? locData : [locData];
-    await insertLocationBatch(locList);
-  }
+  // TODO : Currently not working
+  // for (let i = 0; i < driverNumbers.length; i++) {
+  //   const dn = driverNumbers[i];
+  //   const driverProgress = 88 + ((i + 1) / driverNumbers.length) * 10;
+  //   const locData = await fetchWithProgress(
+  //     sessionKey,
+  //     "fetching_location",
+  //     Math.round(driverProgress),
+  //     () => fetchLocation(sessionKey, dn),
+  //     importId,
+  //   );
+  //   const locList = Array.isArray(locData) ? locData : [locData];
+  //   await insertLocationBatch(locList);
+  // }
 
   // Complete
   updateProgress(sessionKey, {

@@ -342,7 +342,7 @@ export async function insertLocationBatch(rows: any[]) {
   let idx = 1;
   for (const row of rows) {
     values.push(
-      `($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`,
+      `($${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++}, $${idx++})`,
     );
     params.push(
       row.session_key,
