@@ -161,12 +161,12 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
   return (
     <Box className="flex h-full flex-col">
       {/* Controls row */}
-      <Box className="mb-2 flex flex-wrap items-center gap-2">
+      <Box className="w-full mb-2 flex flex-row items-center gap-2">
         {/* Driver selector - Autocomplete with Chips */}
         <Autocomplete
           multiple
           size="small"
-          className="min-w-[180px] max-w-[280px]"
+          className="min-w-45 w-1/2"
           value={allDrivers.filter((d) => selectedDriverNumbers.includes(d.driver_number))}
           onChange={(_, newVal) => setSelectedDriverNumbers(newVal.map((d) => d.driver_number))}
           options={allDrivers}
@@ -190,7 +190,7 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
         />
 
         {/* Lap selector */}
-        <FormControl size="small" className="min-w-[120px]">
+        <FormControl size="small" className="min-w-30 w-1/2">
           <InputLabel>Lap</InputLabel>
           <Select
             value={selectedLapNumber ?? ""}
@@ -255,7 +255,7 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
               labelStyle={{ color: "#fff" }}
               formatter={(value: any, name: any) => [value, name]}
             />
-            <Legend wrapperStyle={{ fontSize: "11px" }} />
+            <Legend wrapperStyle={{ fontSize: "11px", marginBottom: "-10px" }} />
             <Line
               yAxisId="speed"
               type="monotone"

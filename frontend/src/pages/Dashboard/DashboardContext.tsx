@@ -22,7 +22,6 @@ export interface DashboardContextValue {
   handleAddWidget: (type: WidgetConfig["type"]) => void;
   setConfiguringWidget: (id: string | null) => void;
   onBackToHome: () => void;
-  setShowAddWidgetModal: (show: boolean) => void;
 }
 
 export const DashboardContext = createContext<DashboardContextValue | null>(null);

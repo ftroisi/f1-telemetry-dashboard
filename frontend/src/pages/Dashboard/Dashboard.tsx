@@ -10,6 +10,7 @@ import {
 } from "../../state/dashboardState";
 import { DashboardContext, EventInfo } from "./DashboardContext";
 import DashboardUI from "./DashboardUI";
+import type { Layout } from "react-grid-layout";
 
 interface DashboardProps {
   sessionKey: number;
@@ -22,7 +23,6 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
   const [layouts, setLayouts] = useState<LayoutItem[]>([]);
   const [configuringWidget, setConfiguringWidget] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showAddWidgetModal, setShowAddWidgetModal] = useState(false);
 
   const eventInfo: EventInfo = {
     meetingName: sessionStorage.getItem("active-meeting-name") || `Session #${sessionKey}`,
@@ -66,7 +66,7 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
     }
   }, [widgets, layouts, sessionKey]);
 
-  const handleLayoutChange = useCallback((newLayout: import("react-grid-layout").Layout) => {
+  const handleLayoutChange = useCallback((newLayout: Layout) => {
     setLayouts([...newLayout]);
   }, []);
 
@@ -97,7 +97,6 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
       };
       setWidgets((prev) => [...prev, newWidget]);
       setLayouts((prev) => [...prev, { i: id, x: 0, y: Infinity, w: 6, h: 4, minW: 3, minH: 3 }]);
-      setShowAddWidgetModal(false);
     },
     [drivers]
   );
@@ -115,8 +114,7 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
     handleRemoveWidget,
     handleAddWidget,
     setConfiguringWidget,
-    onBackToHome,
-    setShowAddWidgetModal
+    onBackToHome
   };
 
   return (
