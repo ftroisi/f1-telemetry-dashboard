@@ -84,6 +84,14 @@ export async function getSessionCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
+export async function getSessionDataExists(sessionKey: number): Promise<boolean> {
+  const res = await query(
+    "SELECT EXISTS(SELECT 1 FROM drivers WHERE session_key = $1) AS exists",
+    [sessionKey],
+  );
+  return res.rows[0]?.exists ?? false;
+}
+
 // --- Drivers ---
 export async function getDrivers(sessionKey: number) {
   const res = await query(

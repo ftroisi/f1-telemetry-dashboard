@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getMeetings, getSessions, triggerImport, getImportStatus } from "../../api/client";
+import { getMeetings, getSessions, triggerImport, getImportStatus, checkSessionDataExists } from "../../api/client";
 import { toast } from "react-toastify";
 import { ImportProgress, Meeting, Session } from "../../types/onboardingTypes";
 import { OnboardingContext } from "./OnboardingContext";
@@ -15,10 +15,14 @@ interface OnboardingProps {
 
 const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [filteredMeetings, setFilteredMeetings] = useState<Meeting[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [selectedSession, setSelectedSession] = useState<number | null>(null);
   const [year, setYear] = useState<number>(2024);
+  const [hidePreSeason, setHidePreSeason] = useState(true);
+  const [hideFutureEvents, setHideFutureEvents] = useState(true);
+  const [sessionDataExists, setSessionDataExists] = useState<boolean | null>(null);
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [importProgress, setImportProgress] = useState<ImportProgress | null>(null);
@@ -33,11 +37,13 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
         const meetingsData = await getMeetings(year);
         if (!cancelled) {
           setMeetings(meetingsData || []);
+          setFilteredMeetings(meetingsData || []);
           setSelectedMeeting(null);
           setSessions([]);
           setSelectedSession(null);
         }
       } catch (err: any) {
+        console.error("Error fetching meetings:", err);
         if (!cancelled) toast.error(err.message || "Failed to fetch meetings");
       } finally {
         if (!cancelled) setLoadingMeetings(false);
@@ -48,6 +54,28 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       cancelled = true;
     };
   }, [year]);
+
+  // Apply filters whenever meetings, hidePreSeason, or hideFutureEvents change
+  useEffect(() => {
+    let filtered = [...meetings];
+    const now = new Date();
+
+    if (hidePreSeason) {
+      filtered = filtered.filter((m) => {
+        const name = (m.meeting_name || "").toLowerCase();
+        return !name.includes("pre-season") && !name.includes("pre season");
+      });
+    }
+
+    if (hideFutureEvents) {
+      filtered = filtered.filter((m) => {
+        if (!m.date_end) return false;
+        return new Date(m.date_end) <= now;
+      });
+    }
+
+    setFilteredMeetings(filtered);
+  }, [meetings, hidePreSeason, hideFutureEvents]);
 
   // Fetch sessions when a meeting is selected
   useEffect(() => {
@@ -74,6 +102,25 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     };
   }, [selectedMeeting]);
 
+  // Check if session data exists when a session is selected
+  useEffect(() => {
+    if (!selectedSession) {
+      setSessionDataExists(null);
+      return;
+    }
+    let cancelled = false;
+    async function checkData() {
+      try {
+        const result = await checkSessionDataExists(selectedSession!);
+        if (!cancelled) setSessionDataExists(result.exists);
+      } catch {
+        if (!cancelled) setSessionDataExists(null);
+      }
+    }
+    checkData();
+    return () => { cancelled = true; };
+  }, [selectedSession]);
+
   // Poll import progress
   useEffect(() => {
     if (!importing || !selectedSession) return;
@@ -87,9 +134,11 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
           onImportComplete(selectedSession);
         } else if (progress.status === "error") {
           setImporting(false);
+          console.error("Import error:", progress.error);
           toast.error(progress.error || "Import failed");
         }
-      } catch {
+      } catch (err) {
+        console.error("Polling error:", err);
         // ignore polling errors
       }
     }, 1000);
@@ -109,16 +158,21 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       await triggerImport(selectedSession, selectedMeeting!.meeting_key);
     } catch (err: any) {
       setImporting(false);
+      console.error("Error starting import:", err);
       toast.error(err.message || "Failed to start import");
     }
   };
 
   const contextValue = {
     meetings,
+    filteredMeetings,
     sessions,
     selectedMeeting,
     selectedSession,
     year,
+    hidePreSeason,
+    hideFutureEvents,
+    sessionDataExists,
     loadingMeetings,
     loadingSessions,
     importProgress,
@@ -126,6 +180,8 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     setSelectedMeeting,
     setSelectedSession,
     setYear,
+    setHidePreSeason,
+    setHideFutureEvents,
     handleImport,
     onSelectSession
   };

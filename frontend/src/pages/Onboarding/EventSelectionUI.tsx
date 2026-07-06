@@ -2,8 +2,10 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -15,16 +17,21 @@ import { useOnboardingContext } from "./OnboardingContext";
 
 const EventSelectionUI = () => {
   const {
-    meetings,
+    filteredMeetings,
     sessions,
     selectedMeeting,
     selectedSession,
     year,
+    hidePreSeason,
+    hideFutureEvents,
+    sessionDataExists,
     loadingMeetings,
     loadingSessions,
     setSelectedMeeting,
     setSelectedSession,
     setYear,
+    setHidePreSeason,
+    setHideFutureEvents,
     handleImport,
     onSelectSession
   } = useOnboardingContext();
@@ -52,8 +59,8 @@ const EventSelectionUI = () => {
         </Typography>
       </Box>
 
-      {/* Year dropdown */}
-      <Box className="mb-4 flex justify-center">
+      {/* Filters row */}
+      <Box className="mb-4 flex flex-col flex-wrap items-center justify-center gap-4">
         <FormControl className="w-40">
           <InputLabel id="year-label">Year</InputLabel>
           <Select
@@ -70,6 +77,30 @@ const EventSelectionUI = () => {
             ))}
           </Select>
         </FormControl>
+        <Box className="flex flex-row items-center gap-1">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={hidePreSeason}
+              onChange={(e) => setHidePreSeason(e.target.checked)}
+              className="!text-racing-red-500"
+              size="small"
+            />
+          }
+          label={<span className="text-sm text-gray-300">Hide pre-season testing</span>}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={hideFutureEvents}
+              onChange={(e) => setHideFutureEvents(e.target.checked)}
+              className="!text-racing-red-500"
+              size="small"
+            />
+          }
+          label={<span className="text-sm text-gray-300">Hide future events</span>}
+        />
+        </Box>
       </Box>
 
       {/* GrandPrix Autocomplete */}
@@ -78,10 +109,10 @@ const EventSelectionUI = () => {
           className="w-125 max-w-full"
           value={selectedMeeting}
           onChange={(_, newVal) => setSelectedMeeting(newVal)}
-          options={meetings}
+          options={filteredMeetings}
           loading={loadingMeetings}
           getOptionLabel={(m) =>
-            `${m.country_name || m.meeting_name || ""} — ${m.circuit_short_name || m.location || ""}`
+            `${m.meeting_name || m.country_name || ""} — ${m.circuit_short_name || m.location || ""}`
           }
           isOptionEqualToValue={(a, b) => a.meeting_key === b.meeting_key}
           renderInput={(params) => (
@@ -93,10 +124,10 @@ const EventSelectionUI = () => {
               <Box component="li" key={option.meeting_key} {...rest}>
                 <Box>
                   <Typography className="!text-sm !font-semibold">
-                    {option.country_name || option.meeting_name}
+                    {option.meeting_name || option.country_name}
                   </Typography>
                   <Typography className="!text-xs !text-gray-500">
-                    {option.circuit_short_name || option.location}
+                    {option.country_name || option.meeting_name} - {option.circuit_short_name || option.location}
                   </Typography>
                 </Box>
               </Box>
@@ -158,24 +189,37 @@ const EventSelectionUI = () => {
         </FormControl>
       </Box>
 
-      {/* Action Buttons */}
+      {/* Action Buttons — vary based on whether session data already exists */}
       <Box className="mt-5 flex justify-center gap-3">
-        <Button
-          variant="contained"
-          disabled={!selectedMeeting || !selectedSession}
-          onClick={handleImport}
-          className="bg-racing-red-600 hover:bg-racing-red-500 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
-        >
-          Import Data
-        </Button>
-        <Button
-          variant="outlined"
-          disabled={!selectedSession}
-          onClick={() => onSelectSession(selectedSession!)}
-          className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
-        >
-          Browse (Already Imported) <ChevronRight className="h-4 w-4" />
-        </Button>
+        {sessionDataExists ? (
+          <>
+            <Button
+              variant="contained"
+              disabled={!selectedMeeting || !selectedSession}
+              onClick={handleImport}
+              className="bg-racing-red-600 hover:bg-racing-red-500 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+            >
+              Re-Import Data
+            </Button>
+            <Button
+              variant="outlined"
+              disabled={!selectedSession}
+              onClick={() => onSelectSession(selectedSession!)}
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
+            >
+              Browse <ChevronRight className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            disabled={!selectedMeeting || !selectedSession}
+            onClick={handleImport}
+            className="bg-racing-red-600 hover:bg-racing-red-500 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+          >
+            Import Data
+          </Button>
+        )}
       </Box>
     </Box>
   );

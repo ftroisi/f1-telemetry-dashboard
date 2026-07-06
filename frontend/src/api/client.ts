@@ -131,6 +131,10 @@ export async function getLocationData(sessionKey: number, driverNumber?: number)
   return apiGet(`/sessions/${sessionKey}/location${params}`);
 }
 
+export async function checkSessionDataExists(sessionKey: number): Promise<{ exists: boolean; session_key: number }> {
+  return apiGet(`/sessions/${sessionKey}/exists`);
+}
+
 export async function triggerImport(
   sessionKey: number,
   meetingKey: number

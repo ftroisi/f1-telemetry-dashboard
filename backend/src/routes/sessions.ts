@@ -6,6 +6,7 @@ import {
   getPositions,
   getPitData,
   getLocationData,
+  getSessionDataExists,
 } from "../db/queries";
 import {
   getFormat,
@@ -30,6 +31,19 @@ router.get("/:sessionKey/drivers", async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ error: "Failed to fetch drivers", message: err.message });
+  }
+});
+
+// GET /sessions/:sessionKey/exists - Check if session data is imported
+router.get("/:sessionKey/exists", async (req: Request, res: Response) => {
+  try {
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
+    const exists = await getSessionDataExists(sessionKey);
+    res.json({ exists, session_key: sessionKey });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: "Failed to check session data", message: err.message });
   }
 });
 
