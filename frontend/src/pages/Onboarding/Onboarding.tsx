@@ -5,6 +5,7 @@ import { ImportProgress, Meeting, Session } from "../../types/onboardingTypes";
 import { OnboardingContext } from "./OnboardingContext";
 import DataImportUI from "./DataImportUI";
 import EventSelectionUI from "./EventSelectionUI";
+import Box from "node_modules/@mui/material/Box/index.mjs";
 
 interface OnboardingProps {
   onImportComplete: (sessionKey: number) => void;
@@ -131,7 +132,9 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
 
   return (
     <OnboardingContext.Provider value={contextValue}>
-      {importing && importProgress ? <DataImportUI /> : <EventSelectionUI />}
+      <Box className="flex h-full w-full flex-col items-center justify-center mt-4">
+        {importing && importProgress ? <DataImportUI /> : <EventSelectionUI />}
+      </Box>
     </OnboardingContext.Provider>
   );
 };

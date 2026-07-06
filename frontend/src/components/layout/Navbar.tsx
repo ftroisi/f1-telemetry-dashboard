@@ -14,7 +14,7 @@ const Navbar = ({ showBackButton, onBack }: NavbarProps) => {
   return (
     <Box
       component="header"
-      className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] bg-[#0f1115] px-6 py-3"
+      className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] bg-site-bg-dark px-6 py-3"
     >
       <Box className="flex items-center gap-3">
         {showBackButton && onBack && (

@@ -6,12 +6,24 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { checkHealth } from "./api/client";
 import Box from "@mui/material/Box";
+import { createTheme, ThemeProvider } from "node_modules/@mui/material/styles/index.mjs";
 
 // Lazy imports of global components
 const Navbar = safeLazyImport(() => import("components/layout/Navbar"));
 const Footer = safeLazyImport(() => import("components/layout/Footer"));
 const Onboarding = safeLazyImport(() => import("pages/Onboarding/Onboarding"));
 const Dashboard = safeLazyImport(() => import("pages/Dashboard/Dashboard"));
+
+const f1Theme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: { main: "#f70814" },
+    secondary: { main: "#1ca7e3" },
+    background: { default: "#0f1115", paper: "#161b22" },
+    text: { primary: "#ffffff", secondary: "#9ca3af" },
+    divider: "rgba(255,255,255,0.08)",
+  }
+});
 
 function App() {
   const [hasData, setHasData] = useState<boolean | null>(null);
@@ -53,10 +65,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0f1115]">
+      <div className="flex min-h-screen items-center justify-center bg-site-bg-dark">
         <div className="text-center">
           <div className="border-racing-red-500 mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
-          <p className="text-gray-400">Connecting to server...</p>
+          <p className="text-midnight-violet-200">Connecting to server...</p>
         </div>
       </div>
     );
@@ -67,30 +79,32 @@ function App() {
   return (
     <Suspense fallback={<h2>🌀 Loading...</h2>}>
       <LayoutProvider>
-        <ToastContainer
-          position="top-right"
-          autoClose={4000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          pauseOnHover
-          theme="dark"
-        />
-        <Box className="flex min-h-screen flex-col bg-[#0f1115]">
-          <Navbar showBackButton={isDashboardView} onBack={handleBackToHome} />
-          <Box className="flex-1">
-            {!isDashboardView ? (
-              <Onboarding
-                onImportComplete={handleImportComplete}
-                onSelectSession={handleSelectSession}
-                existingSessionKey={sessionKey}
-              />
-            ) : (
-              <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
-            )}
+        <ThemeProvider theme={f1Theme}>
+          <ToastContainer
+            position="top-right"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+            theme="dark"
+          />
+          <Box className="flex min-h-screen flex-col bg-site-bg-dark">
+            <Navbar showBackButton={isDashboardView} onBack={handleBackToHome} />
+            <Box className="flex-1">
+              {!isDashboardView ? (
+                <Onboarding
+                  onImportComplete={handleImportComplete}
+                  onSelectSession={handleSelectSession}
+                  existingSessionKey={sessionKey}
+                />
+              ) : (
+                <Dashboard sessionKey={sessionKey} onBackToHome={handleBackToHome} />
+              )}
+            </Box>
+            <Footer />
           </Box>
-          <Footer />
-        </Box>
+        </ThemeProvider>
       </LayoutProvider>
     </Suspense>
   );

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --color-site-bg-dark: #0f1115;
+
   --color-racing-red-50: #fee6e7;
   --color-racing-red-100: #fdced0;
   --color-racing-red-200: #fc9ca1;
