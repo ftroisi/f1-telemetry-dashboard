@@ -47,7 +47,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
         onClick={(e) => e.stopPropagation()}
       >
         <Box className="flex items-center justify-between border-b border-gray-800 px-5 py-4">
-          <Typography className="text-lg font-semibold">Configure Widget</Typography>
+          <Typography className="!text-lg !font-semibold">Configure Widget</Typography>
           <button onClick={onClose} className="text-gray-500 transition-colors hover:text-white">
             <X className="h-5 w-5" />
           </button>
@@ -56,7 +56,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
         <Box className="space-y-5 p-5">
           {/* Title */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+            <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
               Widget Title
             </Typography>
             <TextField
@@ -71,7 +71,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
 
           {/* Widget Type (read-only) */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+            <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
               Widget Type
             </Typography>
             <Box className="rounded-lg border border-gray-700 bg-[#0f1115] px-3 py-2 text-sm text-gray-300">
@@ -81,7 +81,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
 
           {/* Driver Selection */}
           <Box>
-            <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+            <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
               Drivers
             </Typography>
             <Box className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-700 bg-[#0f1115] p-2">
@@ -103,8 +103,8 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
                     }}
                   />
                   <Box>
-                    <Typography className="text-sm text-gray-200">{driver.name_acronym}</Typography>
-                    <Typography className="ml-2 text-xs text-gray-500">
+                    <Typography className="!text-sm !text-gray-200">{driver.name_acronym}</Typography>
+                    <Typography className="ml-2 !text-xs !text-gray-500">
                       {driver.full_name}
                     </Typography>
                   </Box>
@@ -116,7 +116,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
           {/* Lap Number (for speed-trace) */}
           {widget.type === "speed-trace" && (
             <Box>
-              <Typography className="mb-1.5 block text-sm font-medium text-gray-400">
+              <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
                 Lap Number (optional)
               </Typography>
               <TextField

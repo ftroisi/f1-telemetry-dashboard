@@ -23,7 +23,7 @@ const Navbar = ({ showBackButton, onBack }: NavbarProps) => {
           </button>
         )}
         <img src={f1_logo} alt="F1 Logo" className="h-8 w-auto" />
-        <Typography className="text-lg font-bold text-white">F1 Telemetry Dashboard</Typography>
+        <Typography className="!text-lg !font-bold !text-white">F1 Telemetry Dashboard</Typography>
       </Box>
       {rightContent && <Box className="flex items-center gap-2">{rightContent}</Box>}
     </Box>

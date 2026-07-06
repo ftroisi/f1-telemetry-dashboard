@@ -118,8 +118,8 @@ const DashboardUI = () => {
       <Box component="main" className="p-6">
         {widgets.length === 0 ? (
           <Box className="py-24 text-center">
-            <Typography className="mb-4 text-lg text-gray-500">No widgets yet</Typography>
-            <Typography className="text-sm text-gray-600">
+            <Typography className="mb-4 !text-lg !text-gray-500">No widgets yet</Typography>
+            <Typography className="!text-sm !text-gray-600">
               Add widgets using the button in the header
             </Typography>
           </Box>
@@ -142,7 +142,7 @@ const DashboardUI = () => {
                     <Box className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
                       <GripVertical className="h-4 w-4" />
                     </Box>
-                    <Typography className="text-sm font-medium text-gray-200">
+                    <Typography className="!text-sm !font-medium !text-gray-200">
                       {widget.title}
                     </Typography>
                   </Box>

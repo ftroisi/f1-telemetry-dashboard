@@ -45,8 +45,8 @@ const EventSelectionUI = () => {
   return (
     <Box className="mx-auto max-w-180 px-6 py-6">
       <Box className="mb-6 text-center">
-        <Typography className="mb-1 text-3xl font-bold">Welcome to F1 Telemetry</Typography>
-        <Typography className="mx-auto max-w-125 text-gray-400">
+        <Typography className="mb-1 !text-3xl !font-bold">Welcome to F1 Telemetry</Typography>
+        <Typography className="mx-auto max-w-125 !text-gray-400">
           Browse and import Formula 1 session data from the OpenF1 API to build your custom
           telemetry dashboard.
         </Typography>
@@ -92,10 +92,10 @@ const EventSelectionUI = () => {
             return (
               <Box component="li" key={option.meeting_key} {...rest}>
                 <Box>
-                  <Typography className="text-sm font-semibold">
+                  <Typography className="!text-sm !font-semibold">
                     {option.country_name || option.meeting_name}
                   </Typography>
-                  <Typography className="text-xs text-gray-500">
+                  <Typography className="!text-xs !text-gray-500">
                     {option.circuit_short_name || option.location}
                   </Typography>
                 </Box>
@@ -118,13 +118,13 @@ const EventSelectionUI = () => {
             onChange={(e) => setSelectedSession(e.target.value as number)}
             renderValue={(val) => {
               const s = sessions.find((s) => s.session_key === val);
-              if (!s) return <Typography className="text-gray-500">Select a session</Typography>;
+              if (!s) return <Typography className="!text-gray-500">Select a session</Typography>;
               return (
                 <Box className="flex items-center gap-2">
                   {getSessionTypeIcon(s.session_type)}
                   <Box>
-                    <Typography className="text-sm">{s.session_name}</Typography>
-                    <Typography className="text-xs text-gray-500">
+                    <Typography className="!text-sm">{s.session_name}</Typography>
+                    <Typography className="!text-xs !text-gray-500">
                       {s.session_type} • {new Date(s.date_start).toLocaleDateString()}
                     </Typography>
                   </Box>
@@ -145,8 +145,8 @@ const EventSelectionUI = () => {
                   <Box className="flex items-center gap-2">
                     {getSessionTypeIcon(s.session_type)}
                     <Box>
-                      <Typography className="text-sm">{s.session_name}</Typography>
-                      <Typography className="text-xs text-gray-500">
+                      <Typography className="!text-sm">{s.session_name}</Typography>
+                      <Typography className="!text-xs !text-gray-500">
                         {s.session_type} • {new Date(s.date_start).toLocaleDateString()}
                       </Typography>
                     </Box>

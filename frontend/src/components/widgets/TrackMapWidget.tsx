@@ -88,7 +88,7 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
       <Box className="flex h-full items-center justify-center">
         <Box className="text-center">
           <AlertCircle className="mx-auto mb-2 h-6 w-6 text-red-400" />
-          <Typography className="text-xs text-red-300">{error}</Typography>
+          <Typography className="!text-xs !text-red-300">{error}</Typography>
         </Box>
       </Box>
     );
@@ -97,7 +97,7 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
   if (scatterData.length === 0) {
     return (
       <Box className="flex h-full items-center justify-center">
-        <Typography className="text-sm text-gray-500">No track position data available</Typography>
+        <Typography className="!text-sm !text-gray-500">No track position data available</Typography>
       </Box>
     );
   }
