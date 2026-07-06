@@ -9,7 +9,7 @@ import Box from "node_modules/@mui/material/Box/index.mjs";
 
 interface OnboardingProps {
   onImportComplete: (sessionKey: number) => void;
-  onSelectSession: (sessionKey: number) => void;
+  onSelectSession: (sessionKey: number, meetingName?: string, sessionName?: string, date?: string) => void;
   existingSessionKey: number | null;
 }
 
@@ -128,10 +128,21 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       try {
         const progress = await getImportStatus(selectedSession);
         setImportProgress(progress);
-        if (progress.status === "complete") {
-          setImporting(false);
-          toast.success("Import complete!");
-          onImportComplete(selectedSession);
+       if (progress.status === "complete") {
+         setImporting(false);
+         toast.success("Import complete!");
+          // Store event info
+          const s = sessions.find((s) => s.session_key === selectedSession);
+          const m = selectedMeeting;
+          if (m) {
+            const meetingName = `${m.meeting_name || m.country_name} — ${m.circuit_short_name || m.location || ""}`;
+            sessionStorage.setItem("active-meeting-name", meetingName);
+          }
+          if (s) {
+            sessionStorage.setItem("active-session-name", s.session_name);
+            sessionStorage.setItem("active-session-date", s.date_start);
+          }
+          onImportComplete(selectedSession!);
         } else if (progress.status === "error") {
           setImporting(false);
           console.error("Import error:", progress.error);

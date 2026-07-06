@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import safeLazyImport from "./safeLazyImport";
 import { LayoutProvider } from "./components/layout/LayoutContext";
 import { ToastContainer } from "react-toastify";
@@ -47,21 +47,27 @@ function App() {
     init();
   }, []);
 
-  const handleImportComplete = (sKey: number) => {
+  const handleImportComplete = useCallback((sKey: number) => {
     setHasData(true);
     setSessionKey(sKey);
     sessionStorage.setItem("active-session-key", String(sKey));
-  };
+  }, []);
 
-  const handleSelectSession = (sKey: number) => {
+  const handleSelectSession = useCallback((sKey: number, meetingName?: string, sessionName?: string, date?: string) => {
     setSessionKey(sKey);
     sessionStorage.setItem("active-session-key", String(sKey));
-  };
+    if (meetingName) sessionStorage.setItem("active-meeting-name", meetingName);
+    if (sessionName) sessionStorage.setItem("active-session-name", sessionName);
+    if (date) sessionStorage.setItem("active-session-date", date);
+  }, []);
 
-  const handleBackToHome = () => {
+  const handleBackToHome = useCallback(() => {
     setSessionKey(null);
     sessionStorage.removeItem("active-session-key");
-  };
+    sessionStorage.removeItem("active-meeting-name");
+    sessionStorage.removeItem("active-session-name");
+    sessionStorage.removeItem("active-session-date");
+  }, []);
 
   if (loading) {
     return (
@@ -90,7 +96,7 @@ function App() {
             theme="dark"
           />
           <Box className="flex min-h-screen flex-col bg-site-bg-dark">
-            <Navbar showBackButton={isDashboardView} onBack={handleBackToHome} />
+            <Navbar />
             <Box className="flex-1">
               {!isDashboardView ? (
                 <Onboarding

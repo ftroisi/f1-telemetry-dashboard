@@ -60,6 +60,16 @@ This will:
 - Build and start the Node.js backend
 - Build and start the React frontend (served via Nginx)
 
+#### Development
+
+To execute the project in development mode (which allows hot refresh of the page in case of changes), run:
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+from the project root folder
+
 ### 2. Access the dashboard
 
 Open your browser to **http://localhost:3000**

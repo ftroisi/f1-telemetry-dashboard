@@ -2,8 +2,15 @@ import { createContext, useContext } from "react";
 import { Driver } from "../../api/client";
 import { WidgetConfig, LayoutItem } from "../../state/dashboardState";
 
+export interface EventInfo {
+  meetingName: string;
+  sessionName: string;
+  sessionDate: string;
+}
+
 export interface DashboardContextValue {
   sessionKey: number;
+  eventInfo: EventInfo;
   drivers: Driver[];
   widgets: WidgetConfig[];
   layouts: LayoutItem[];
@@ -15,6 +22,7 @@ export interface DashboardContextValue {
   handleAddWidget: (type: WidgetConfig["type"]) => void;
   setConfiguringWidget: (id: string | null) => void;
   onBackToHome: () => void;
+  setShowAddWidgetModal: (show: boolean) => void;
 }
 
 export const DashboardContext = createContext<DashboardContextValue | null>(null);

@@ -8,7 +8,7 @@ import {
   getDefaultWidgets,
   getDefaultLayout
 } from "../../state/dashboardState";
-import { DashboardContext } from "./DashboardContext";
+import { DashboardContext, EventInfo } from "./DashboardContext";
 import DashboardUI from "./DashboardUI";
 
 interface DashboardProps {
@@ -22,6 +22,13 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
   const [layouts, setLayouts] = useState<LayoutItem[]>([]);
   const [configuringWidget, setConfiguringWidget] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAddWidgetModal, setShowAddWidgetModal] = useState(false);
+
+  const eventInfo: EventInfo = {
+    meetingName: sessionStorage.getItem("active-meeting-name") || `Session #${sessionKey}`,
+    sessionName: sessionStorage.getItem("active-session-name") || "",
+    sessionDate: sessionStorage.getItem("active-session-date") || ""
+  };
 
   // Load drivers
   useEffect(() => {
@@ -90,12 +97,14 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
       };
       setWidgets((prev) => [...prev, newWidget]);
       setLayouts((prev) => [...prev, { i: id, x: 0, y: Infinity, w: 6, h: 4, minW: 3, minH: 3 }]);
+      setShowAddWidgetModal(false);
     },
     [drivers]
   );
 
   const contextValue = {
     sessionKey,
+    eventInfo,
     drivers,
     widgets,
     layouts,
@@ -106,7 +115,8 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
     handleRemoveWidget,
     handleAddWidget,
     setConfiguringWidget,
-    onBackToHome
+    onBackToHome,
+    setShowAddWidgetModal
   };
 
   return (

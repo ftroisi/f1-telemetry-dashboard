@@ -201,11 +201,18 @@ const EventSelectionUI = () => {
             >
               Re-Import Data
             </Button>
-            <Button
-              variant="outlined"
-              disabled={!selectedSession}
-              onClick={() => onSelectSession(selectedSession!)}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
+           <Button
+             variant="outlined"
+             disabled={!selectedSession}
+              onClick={() => {
+                const s = sessions.find((s) => s.session_key === selectedSession);
+                const m = selectedMeeting;
+                const meetingName = m ? `${m.meeting_name || m.country_name} — ${m.circuit_short_name || m.location || ""}` : undefined;
+                const sessionName = s?.session_name;
+                const date = s?.date_start;
+                onSelectSession(selectedSession!, meetingName, sessionName, date);
+              }}
+             className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
             >
               Browse <ChevronRight className="h-4 w-4" />
             </Button>

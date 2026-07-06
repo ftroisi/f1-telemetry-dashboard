@@ -1,9 +1,22 @@
-import { useEffect } from "react";
-import GridLayout from "react-grid-layout";
-import { Button, Box, Typography, ThemeProvider, createTheme } from "@mui/material";
-import { Settings, Plus, GripVertical } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import GridLayout, { verticalCompactor } from "react-grid-layout";
+import {
+  Button,
+  Box,
+  Typography,
+  ThemeProvider,
+  createTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItemButton,
+  ListItemText
+} from "@mui/material";
+import { Settings, Plus, GripVertical, ChevronLeft, Calendar } from "lucide-react";
 import { useDashboardContext } from "./DashboardContext";
-import { useLayoutContext } from "../../components/layout/LayoutContext";
+import { WidgetConfig } from "../../state/dashboardState";
 import SpeedTraceWidget from "../../components/widgets/SpeedTraceWidget";
 import SectorTimesWidget from "../../components/widgets/SectorTimesWidget";
 import TrackMapWidget from "../../components/widgets/TrackMapWidget";
@@ -21,17 +34,50 @@ const f1Theme = createTheme({
   }
 });
 
-const widgetOptions = [
-  { type: "speed-trace" as const, label: "Speed / Throttle / Brake" },
-  { type: "sector-times" as const, label: "Sector Time Comparison" },
-  { type: "track-map" as const, label: "Track Position Map" },
-  { type: "pit-stops" as const, label: "Pit Stop Duration" },
-  { type: "race-positions" as const, label: "Race Position Changes" }
+const widgetOptions: { type: WidgetConfig["type"]; label: string }[] = [
+  { type: "speed-trace", label: "Speed / Throttle / Brake" },
+  { type: "sector-times", label: "Sector Time Comparison" },
+  { type: "track-map", label: "Track Position Map" },
+  { type: "pit-stops", label: "Pit Stop Duration" },
+  { type: "race-positions", label: "Race Position Changes" }
 ];
+
+const AddWidgetModal = ({
+  open,
+  onClose,
+  onSelect
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSelect: (type: WidgetConfig["type"]) => void;
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle className="!bg-[#161b22] !text-gray-200">Add Widget</DialogTitle>
+      <DialogContent className="!bg-[#161b22] !p-0">
+        <List>
+          {widgetOptions.map(({ type, label }) => (
+            <ListItemButton
+              key={type}
+              onClick={() => onSelect(type)}
+              className="!text-gray-300 hover:!bg-gray-800 hover:!text-white"
+            >
+              <ListItemText primary={label} />
+            </ListItemButton>
+          ))}
+        </List>
+      </DialogContent>
+      <DialogActions className="!bg-[#161b22] !border-t !border-gray-800">
+        <Button onClick={onClose} className="!text-gray-400">Cancel</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const DashboardUI = () => {
   const {
     sessionKey,
+    eventInfo,
     drivers,
     widgets,
     layouts,
@@ -41,37 +87,27 @@ const DashboardUI = () => {
     handleUpdateWidget,
     handleRemoveWidget,
     handleAddWidget,
-    setConfiguringWidget
+    setConfiguringWidget,
+    onBackToHome
   } = useDashboardContext();
 
-  const { setRightContent } = useLayoutContext();
+  const [showAddWidgetModal, setShowAddWidgetModal] = useState(false);
 
-  // Set Add Widget button in the global Navbar
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [gridWidth, setGridWidth] = useState(1200);
+
+  // Observe container width for full-width grid
   useEffect(() => {
-    setRightContent(
-      <Box className="group relative">
-        <Button
-          variant="contained"
-          className="bg-racing-red-600 hover:bg-racing-red-500 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all"
-        >
-          <Plus className="h-4 w-4" />
-          Add Widget
-        </Button>
-        <Box className="invisible absolute top-full right-0 z-50 mt-1 w-56 rounded-lg border border-gray-800 bg-[#161b22] opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-          {widgetOptions.map(({ type, label }) => (
-            <button
-              key={type}
-              onClick={() => handleAddWidget(type)}
-              className="w-full px-4 py-2.5 text-left text-sm text-gray-300 first:rounded-t-lg last:rounded-b-lg hover:bg-gray-800 hover:text-white"
-            >
-              {label}
-            </button>
-          ))}
-        </Box>
-      </Box>
-    );
-    return () => setRightContent(null);
-  }, [setRightContent, handleAddWidget]);
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setGridWidth(entry.contentRect.width);
+        }
+      }
+    });
+    if (gridRef.current) observer.observe(gridRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   if (loading) {
     return (
@@ -115,72 +151,137 @@ const DashboardUI = () => {
 
   return (
     <ThemeProvider theme={f1Theme}>
-      <Box component="main" className="p-6">
+      {/* Event Info Bar */}
+      <Box className="flex items-center justify-between border-b border-gray-800 bg-[#1a1a2e] px-6 py-3">
+        <Box className="flex items-center gap-4">
+          <button
+            onClick={onBackToHome}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-700 bg-[#161b22] px-3 py-1.5 text-sm text-gray-300 transition-all hover:border-gray-600 hover:text-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Change Event
+          </button>
+          <Box className="h-6 w-px bg-gray-700" />
+          <Box>
+            <Typography className="!text-base !font-semibold !text-white">
+              {eventInfo.meetingName}
+            </Typography>
+            <Box className="flex items-center gap-3 text-xs text-gray-400">
+              {eventInfo.sessionDate && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {new Date(eventInfo.sessionDate).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })}
+                </span>
+              )}
+              {eventInfo.sessionName && (
+                <>
+                  <span className="text-gray-600">|</span>
+                  <span>{eventInfo.sessionName}</span>
+                </>
+              )}
+            </Box>
+          </Box>
+        </Box>
+        <Button
+          variant="contained"
+          onClick={() => setShowAddWidgetModal(true)}
+          className="!flex !items-center !gap-2 !rounded-lg !bg-racing-red-600 !px-4 !py-2 !text-sm !font-medium !text-white !transition-all hover:!bg-racing-red-500"
+        >
+          <Plus className="h-4 w-4" />
+          Add Widget
+        </Button>
+      </Box>
+
+      {/* Main Content - full width */}
+      <Box component="main" className="p-4">
         {widgets.length === 0 ? (
           <Box className="py-24 text-center">
             <Typography className="mb-4 !text-lg !text-gray-500">No widgets yet</Typography>
             <Typography className="!text-sm !text-gray-600">
-              Add widgets using the button in the header
+              Add widgets using the button above
             </Typography>
           </Box>
         ) : (
-          <GridLayout
-            className="layout"
-            layout={gridLayout}
-            width={1200}
-            onLayoutChange={handleLayoutChange}
-            gridConfig={{ cols: 12, rowHeight: 100, margin: [16, 16], containerPadding: [0, 0] }}
-            dragConfig={{ handle: ".drag-handle" }}
-          >
-            {widgets.map((widget) => (
-              <Box
-                key={widget.id}
-                className="group overflow-hidden rounded-xl border border-gray-800 bg-[#161b22]"
-              >
-                <Box className="flex items-center justify-between border-b border-gray-800 bg-[#1a1a2e] px-4 py-2.5">
-                  <Box className="flex items-center gap-2">
-                    <Box className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
-                      <GripVertical className="h-4 w-4" />
+          <Box ref={gridRef} className="w-full">
+            <GridLayout
+              className="layout"
+              layout={gridLayout}
+              width={gridWidth}
+              onLayoutChange={handleLayoutChange}
+              gridConfig={{
+                cols: 12,
+                rowHeight: 100,
+                margin: [16, 16] as [number, number],
+                containerPadding: [0, 0] as [number, number]
+              }}
+              dragConfig={{ handle: ".drag-handle" }}
+              compactor={verticalCompactor}
+              autoSize
+            >
+              {widgets.map((widget) => (
+                <Box
+                  key={widget.id}
+                  className="group overflow-hidden rounded-xl border border-gray-800 bg-[#161b22]"
+                >
+                  <Box className="flex items-center justify-between border-b border-gray-800 bg-[#1a1a2e] px-4 py-2.5">
+                    <Box className="flex items-center gap-2">
+                      <Box className="drag-handle cursor-grab text-gray-600 hover:text-gray-400 active:cursor-grabbing">
+                        <GripVertical className="h-4 w-4" />
+                      </Box>
+                      <Typography className="!text-sm !font-medium !text-gray-200">
+                        {widget.title}
+                      </Typography>
                     </Box>
-                    <Typography className="!text-sm !font-medium !text-gray-200">
-                      {widget.title}
-                    </Typography>
-                  </Box>
-                  <Box className="flex items-center gap-1">
-                    <button
-                      onClick={() => setConfiguringWidget(widget.id)}
-                      className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-white"
-                      title="Configure"
-                    >
-                      <Settings className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleRemoveWidget(widget.id)}
-                      className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-red-400"
-                      title="Remove"
-                    >
-                      <svg
-                        className="h-3.5 w-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <Box className="flex items-center gap-1">
+                      <button
+                        onClick={() => setConfiguringWidget(widget.id)}
+                        className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-white"
+                        title="Configure"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
+                        <Settings className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleRemoveWidget(widget.id)}
+                        className="rounded p-1.5 text-gray-500 transition-all hover:bg-gray-800 hover:text-red-400"
+                        title="Remove"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </Box>
                   </Box>
+                  <Box className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</Box>
                 </Box>
-                <Box className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</Box>
-              </Box>
-            ))}
-          </GridLayout>
+              ))}
+            </GridLayout>
+          </Box>
         )}
       </Box>
+
+      {/* Add Widget Modal */}
+      <AddWidgetModal
+        open={showAddWidgetModal}
+        onClose={() => setShowAddWidgetModal(false)}
+        onSelect={(type) => {
+          handleAddWidget(type);
+          setShowAddWidgetModal(false);
+        }}
+      />
 
       {/* Config Panel Modal */}
       {configuringWidget && (

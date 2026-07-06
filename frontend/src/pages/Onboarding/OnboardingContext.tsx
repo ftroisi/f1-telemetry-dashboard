@@ -21,7 +21,7 @@ export interface OnboardingContextValue {
   setHidePreSeason: (hide: boolean) => void;
   setHideFutureEvents: (hide: boolean) => void;
   handleImport: () => void;
-  onSelectSession: (sessionKey: number) => void;
+  onSelectSession: (sessionKey: number, meetingName?: string, sessionName?: string, date?: string) => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextValue | null>(null);

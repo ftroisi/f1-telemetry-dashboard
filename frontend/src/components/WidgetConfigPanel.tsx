@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { WidgetConfig } from "../state/dashboardState";
 import { Driver } from "../api/client";
-import { Button, Box, Typography, TextField } from "@mui/material";
+import {
+  Button,
+  Box,
+  Typography,
+  TextField,
+  Autocomplete,
+  Chip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
+} from "@mui/material";
 import { X } from "lucide-react";
 
 interface WidgetConfigPanelProps {
@@ -20,21 +31,19 @@ const WIDGET_TYPES: { type: WidgetConfig["type"]; label: string }[] = [
 ];
 
 const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigPanelProps) => {
-  const [selectedDrivers, setSelectedDrivers] = useState<number[]>(widget.driverNumbers);
+  const [selectedDrivers, setSelectedDrivers] = useState<Driver[]>(
+    drivers.filter((d) => widget.driverNumbers.includes(d.driver_number))
+  );
   const [title, setTitle] = useState(widget.title);
+  const [lapNumber, setLapNumber] = useState<number | undefined>(widget.lapNumber);
 
   const handleSave = () => {
     onUpdate({
       title,
-      driverNumbers: selectedDrivers
+      driverNumbers: selectedDrivers.map((d) => d.driver_number),
+      lapNumber: widget.type === "speed-trace" ? lapNumber : undefined
     });
     onClose();
-  };
-
-  const toggleDriver = (dn: number) => {
-    setSelectedDrivers((prev) =>
-      prev.includes(dn) ? prev.filter((d) => d !== dn) : [...prev, dn]
-    );
   };
 
   return (
@@ -79,57 +88,82 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
             </Box>
           </Box>
 
-          {/* Driver Selection */}
+          {/* Driver Selection - Autocomplete with Chips */}
           <Box>
             <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
               Drivers
             </Typography>
-            <Box className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-gray-700 bg-[#0f1115] p-2">
-              {drivers.map((driver) => (
-                <label
-                  key={driver.driver_number}
-                  className="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 hover:bg-gray-800"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedDrivers.includes(driver.driver_number)}
-                    onChange={() => toggleDriver(driver.driver_number)}
-                    className="text-racing-red-500 focus:ring-racing-red-500 rounded border-gray-600 bg-gray-800"
-                  />
-                  <Box
-                    className="h-3 w-3 rounded-full"
-                    style={{
-                      backgroundColor: driver.team_colour ? `#${driver.team_colour}` : "#888"
-                    }}
-                  />
-                  <Box>
-                    <Typography className="!text-sm !text-gray-200">{driver.name_acronym}</Typography>
-                    <Typography className="ml-2 !text-xs !text-gray-500">
-                      {driver.full_name}
-                    </Typography>
+            <Autocomplete
+              multiple
+              size="small"
+              value={selectedDrivers}
+              onChange={(_, newVal) => setSelectedDrivers(newVal)}
+              options={drivers}
+              getOptionLabel={(d) => `${d.name_acronym} — ${d.full_name}`}
+              isOptionEqualToValue={(a, b) => a.driver_number === b.driver_number}
+              renderValue={(value, getItemProps) =>
+                (value as Driver[]).map((option, index) => {
+                  const itemProps = getItemProps({ index });
+                  return (
+                    <Chip
+                      label={option.name_acronym}
+                      size="small"
+                      {...itemProps}
+                      sx={{
+                        backgroundColor: option.team_colour ? `#${option.team_colour}33` : undefined,
+                        color: option.team_colour ? `#${option.team_colour}` : undefined,
+                        border: option.team_colour ? `1px solid #${option.team_colour}` : undefined
+                      }}
+                    />
+                  );
+                })
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="Drivers" placeholder="Search drivers..." />
+              )}
+              renderOption={(props, option) => {
+                const { key, ...rest } = props;
+                return (
+                  <Box component="li" key={option.driver_number} {...rest}>
+                    <Box
+                      className="mr-2 h-3 w-3 rounded-full shrink-0"
+                      style={{
+                        backgroundColor: option.team_colour ? `#${option.team_colour}` : "#888"
+                      }}
+                    />
+                    <Box>
+                      <Typography className="!text-sm">{option.name_acronym}</Typography>
+                      <Typography className="!text-xs !text-gray-500">
+                        {option.full_name}
+                      </Typography>
+                    </Box>
                   </Box>
-                </label>
-              ))}
-            </Box>
+                );
+              }}
+            />
           </Box>
 
           {/* Lap Number (for speed-trace) */}
           {widget.type === "speed-trace" && (
             <Box>
               <Typography className="mb-1.5 block !text-sm !font-medium !text-gray-400">
-                Lap Number (optional)
+                Lap Number
               </Typography>
-              <TextField
-                type="number"
-                slotProps={{ htmlInput: { min: 1 } }}
-                value={widget.lapNumber || ""}
-                onChange={(e) =>
-                  onUpdate({ lapNumber: e.target.value ? parseInt(e.target.value) : undefined })
-                }
-                className="w-full"
-                placeholder="All laps"
-                size="small"
-              />
+              <FormControl size="small" className="w-full">
+                <InputLabel>Lap</InputLabel>
+                <Select
+                  value={lapNumber ?? ""}
+                  label="Lap"
+                  onChange={(e) =>
+                    setLapNumber(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                >
+                  <MenuItem value="">All laps</MenuItem>
+                  <MenuItem value={1}>Lap 1</MenuItem>
+                  <MenuItem value={2}>Lap 2</MenuItem>
+                  <MenuItem value={3}>Lap 3</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
           )}
         </Box>

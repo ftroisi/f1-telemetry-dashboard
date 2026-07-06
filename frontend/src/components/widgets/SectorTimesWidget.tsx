@@ -106,7 +106,7 @@ const SectorTimesWidget = ({ sessionKey, driverNumbers }: SectorTimesWidgetProps
       <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
         <XAxis dataKey="name" tick={{ fill: "#999", fontSize: 11 }} stroke="#555" />
-        <YAxis tick={{ fill: "#999", fontSize: 10 }} stroke="#555" />
+        <YAxis tick={{ fill: "#999", fontSize: 10 }} stroke="#555" label={{ value: "Time (s)", angle: -90, position: "insideLeft", fill: "#999", fontSize: 10, offset: 5 }} />
         <Tooltip
           contentStyle={{
             backgroundColor: "#1a1a2e",

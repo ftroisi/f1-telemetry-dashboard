@@ -10,7 +10,7 @@ import {
   Legend
 } from "recharts";
 import { Box, Typography } from "@mui/material";
-import { getLocationData } from "../../api/client";
+import { getLocationData, getDrivers, Driver } from "../../api/client";
 import { Loader2, AlertCircle } from "lucide-react";
 
 interface TrackMapWidgetProps {
@@ -24,6 +24,7 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
   const [scatterData, setScatterData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [allDrivers, setAllDrivers] = useState<Driver[]>([]);
 
   const colors = [
     "#1ca7e3",
@@ -35,6 +36,21 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
     "#ff8800",
     "#aa66ff"
   ];
+
+  useEffect(() => {
+    async function loadDrivers() {
+      try {
+        const d = await getDrivers(sessionKey);
+        setAllDrivers(d || []);
+      } catch {}
+    }
+    loadDrivers();
+  }, [sessionKey]);
+
+  const getDriverName = (dn: number) => {
+    const d = allDrivers.find((dr) => dr.driver_number === dn);
+    return d ? d.name_acronym : `#${dn}`;
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -60,7 +76,7 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
         const series = allData
           .filter((s) => s.data.length > 0)
           .map((s) => ({
-            name: `Driver #${s.driverNumber}`,
+            name: getDriverName(s.driverNumber),
             color: s.color,
             data: s.data
           }));
@@ -106,8 +122,20 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
     <ResponsiveContainer width="100%" height="100%">
       <ScatterChart margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-        <XAxis dataKey="x" type="number" tick={{ fill: "#999", fontSize: 10 }} stroke="#555" />
-        <YAxis dataKey="y" type="number" tick={{ fill: "#999", fontSize: 10 }} stroke="#555" />
+        <XAxis
+          dataKey="x"
+          type="number"
+          tick={{ fill: "#999", fontSize: 10 }}
+          stroke="#555"
+          label={{ value: "X (m)", position: "insideBottom", fill: "#999", fontSize: 10, offset: -5 }}
+        />
+        <YAxis
+          dataKey="y"
+          type="number"
+          tick={{ fill: "#999", fontSize: 10 }}
+          stroke="#555"
+          label={{ value: "Y (m)", angle: -90, position: "insideLeft", fill: "#999", fontSize: 10, offset: 5 }}
+        />
         <Tooltip
           contentStyle={{
             backgroundColor: "#1a1a2e",
