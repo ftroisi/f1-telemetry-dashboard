@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getDrivers, Driver } from "../../api/client";
+import { getDrivers, getEventInfoBySession, Driver } from "../../api/client";
 import {
   WidgetConfig,
   LayoutItem,
@@ -24,11 +24,11 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
   const [configuringWidget, setConfiguringWidget] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const eventInfo: EventInfo = {
+  const [eventInfo, setEventInfo] = useState<EventInfo>({
     meetingName: sessionStorage.getItem("active-meeting-name") || `Session #${sessionKey}`,
     sessionName: sessionStorage.getItem("active-session-name") || "",
     sessionDate: sessionStorage.getItem("active-session-date") || ""
-  };
+  });
 
   // Load drivers
   useEffect(() => {
@@ -55,6 +55,22 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
       } finally {
         setLoading(false);
       }
+    }
+    // If sessionStorage doesn't have event info, fetch from API
+    if (!sessionStorage.getItem("active-meeting-name")) {
+      getEventInfoBySession(sessionKey).then(info => {
+        if (info) {
+          const meetingName = `${info.meeting_name || info.country_name} — ${info.circuit_short_name || info.location || ""}`;
+          setEventInfo({
+            meetingName,
+            sessionName: info.session_name || "",
+            sessionDate: info.session_date_start || ""
+          });
+          sessionStorage.setItem("active-meeting-name", meetingName);
+          sessionStorage.setItem("active-session-name", info.session_name || "");
+          sessionStorage.setItem("active-session-date", info.session_date_start || "");
+        }
+      }).catch(err => console.error("Failed to fetch event info:", err));
     }
     loadDrivers();
   }, [sessionKey]);

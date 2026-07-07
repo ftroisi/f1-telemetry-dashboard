@@ -27,13 +27,16 @@ const EventSelectionUI = () => {
     sessionDataExists,
     loadingMeetings,
     loadingSessions,
+    importedEvents,
+    loadingImportedEvents,
     setSelectedMeeting,
     setSelectedSession,
     setYear,
     setHidePreSeason,
     setHideFutureEvents,
     handleImport,
-    onSelectSession
+    onSelectSession,
+    onSelectImportedSession
   } = useOnboardingContext();
 
   const years = [2023, 2024, 2025, 2026] as const;
@@ -58,6 +61,63 @@ const EventSelectionUI = () => {
           telemetry dashboard.
         </Typography>
       </Box>
+
+      {/* "Load a session" section - only show if there are imported events */}
+      {importedEvents.length > 0 && (
+        <>
+          <Box className="mb-6 text-center">
+            <Typography className="mb-1 !text-xl !font-semibold">Load a session</Typography>
+          </Box>
+
+          {/* Imported Events Autocomplete */}
+          <Box className="mb-4 flex justify-center">
+            <Autocomplete
+              className="w-125 max-w-full"
+              onChange={(_, newVal) => {
+                if (newVal) {
+                  onSelectImportedSession(newVal.session_key);
+                }
+              }}
+              options={importedEvents}
+              loading={loadingImportedEvents}
+              getOptionLabel={(e) =>
+                `${e.meeting_name || e.country_name || ""} — ${e.session_name || ""}`
+              }
+              isOptionEqualToValue={(a, b) => a.session_key === b.session_key}
+              renderInput={(params) => (
+                <TextField {...params} label="Session" placeholder="Search previously imported sessions..." />
+              )}
+              renderOption={(props, option) => {
+                const { key, ...rest } = props;
+                return (
+                  <Box component="li" key={option.session_key} {...rest}>
+                    <Box>
+                      <Typography className="!text-sm !font-semibold">
+                        {option.meeting_name || option.country_name}
+                      </Typography>
+                      <Typography className="!text-xs !text-gray-500">
+                        {option.session_name} {option.session_date_start ? `• ${new Date(option.session_date_start).toLocaleDateString()}` : ""}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              }}
+              noOptionsText="No previously imported sessions"
+            />
+          </Box>
+
+          {/* Divider with "or" */}
+          <Box className="mb-6 flex items-center gap-3">
+            <Box className="h-px flex-1 bg-gray-700" />
+            <Typography className="!text-sm !text-gray-500">or</Typography>
+            <Box className="h-px flex-1 bg-gray-700" />
+          </Box>
+        </>
+      )}
+
+      <Box className="mb-6 text-center">
+            <Typography className="mb-1 !text-xl !font-semibold">Import a session</Typography>
+          </Box>
 
       {/* Filters row */}
       <Box className="mb-4 flex flex-col flex-wrap items-center justify-center gap-4">
@@ -227,8 +287,7 @@ const EventSelectionUI = () => {
             Import Data
           </Button>
         )}
-      </Box>
-    </Box>
+      </Box>    </Box>
   );
 };
 

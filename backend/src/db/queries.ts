@@ -92,6 +92,51 @@ export async function getSessionDataExists(sessionKey: number): Promise<boolean>
   return res.rows[0]?.exists ?? false;
 }
 
+
+export async function getImportedEvents() {
+  const sql = `
+    SELECT DISTINCT ON (m.meeting_key)
+      m.meeting_key,
+      m.meeting_name,
+      m.country_name,
+      m.circuit_short_name,
+      m.location,
+      m.year,
+      m.date_start AS meeting_date_start,
+      s.session_key,
+      s.session_name,
+      s.session_type,
+      s.date_start AS session_date_start
+    FROM meetings m
+    JOIN sessions s ON s.meeting_key = m.meeting_key
+    JOIN drivers d ON d.session_key = s.session_key
+    ORDER BY m.meeting_key, s.date_start DESC
+  `;
+  const res = await query(sql);
+  return res.rows;
+}
+
+export async function getEventInfoBySession(sessionKey: number) {
+  const sql = `
+    SELECT
+      s.session_key,
+      s.session_name,
+      s.session_type,
+      s.date_start AS session_date_start,
+      s.meeting_key,
+      m.meeting_name,
+      m.country_name,
+      m.circuit_short_name,
+      m.location,
+      m.year,
+      m.date_start AS meeting_date_start
+    FROM sessions s
+    JOIN meetings m ON m.meeting_key = s.meeting_key
+    WHERE s.session_key =   `;
+  const res = await query(sql, [sessionKey]);
+  return res.rows[0] || null;
+}
+
 // --- Drivers ---
 export async function getDrivers(sessionKey: number) {
   const res = await query(

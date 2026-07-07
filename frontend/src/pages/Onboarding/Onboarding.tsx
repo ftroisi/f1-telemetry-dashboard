@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { getMeetings, getSessions, triggerImport, getImportStatus, checkSessionDataExists } from "../../api/client";
+import { getMeetings, getSessions, triggerImport, getImportStatus, checkSessionDataExists, getImportedEvents, getEventInfoBySession } from "../../api/client";
 import { toast } from "react-toastify";
-import { ImportProgress, Meeting, Session } from "../../types/onboardingTypes";
+import { ImportProgress, Meeting, Session, ImportedEvent } from "../../types/onboardingTypes";
 import { OnboardingContext } from "./OnboardingContext";
 import DataImportUI from "./DataImportUI";
 import EventSelectionUI from "./EventSelectionUI";
@@ -27,6 +27,8 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [importProgress, setImportProgress] = useState<ImportProgress | null>(null);
   const [importing, setImporting] = useState(false);
+  const [importedEvents, setImportedEvents] = useState<ImportedEvent[]>([]);
+  const [loadingImportedEvents, setLoadingImportedEvents] = useState(false);
 
   // Fetch meetings when year changes
   useEffect(() => {
@@ -54,6 +56,27 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       cancelled = true;
     };
   }, [year]);
+  // Fetch imported events from local DB
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchImported() {
+      setLoadingImportedEvents(true);
+      try {
+        const events = await getImportedEvents();
+        if (!cancelled) {
+          setImportedEvents(events || []);
+        }
+      } catch (err: any) {
+        console.error("Error fetching imported events:", err);
+        if (!cancelled) setImportedEvents([]);
+      } finally {
+        if (!cancelled) setLoadingImportedEvents(false);
+      }
+    }
+    fetchImported();
+    return () => { cancelled = true; };
+  }, [importing]);  // Re-fetch when import finishes
+
 
   // Apply filters whenever meetings, hidePreSeason, or hideFutureEvents change
   useEffect(() => {
@@ -174,6 +197,21 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     }
   };
 
+  const handleSelectImportedSession = async (sessionKey: number) => {
+    try {
+      const info = await getEventInfoBySession(sessionKey);
+      if (info) {
+        const meetingName = `${info.meeting_name || info.country_name} — ${info.circuit_short_name || info.location || ""}`;
+        onSelectSession(sessionKey, meetingName, info.session_name, info.session_date_start);
+      } else {
+        onSelectSession(sessionKey);
+      }
+    } catch (err: any) {
+      console.error("Error fetching event info:", err);
+      onSelectSession(sessionKey);
+    }
+  };
+
   const contextValue = {
     meetings,
     filteredMeetings,
@@ -188,13 +226,16 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     loadingSessions,
     importProgress,
     importing,
+    importedEvents,
+    loadingImportedEvents,
     setSelectedMeeting,
     setSelectedSession,
     setYear,
     setHidePreSeason,
     setHideFutureEvents,
     handleImport,
-    onSelectSession
+    onSelectSession,
+    onSelectImportedSession: handleSelectImportedSession
   };
 
   return (

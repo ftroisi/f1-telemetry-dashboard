@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { Meeting, Session, ImportProgress } from "../../types/onboardingTypes";
+import { Meeting, Session, ImportProgress, ImportedEvent } from "../../types/onboardingTypes";
 
 export interface OnboardingContextValue {
   meetings: Meeting[];
@@ -22,6 +22,9 @@ export interface OnboardingContextValue {
   setHideFutureEvents: (hide: boolean) => void;
   handleImport: () => void;
   onSelectSession: (sessionKey: number, meetingName?: string, sessionName?: string, date?: string) => void;
+  importedEvents: ImportedEvent[];
+  loadingImportedEvents: boolean;
+  onSelectImportedSession: (sessionKey: number) => void;
 }
 
 export const OnboardingContext = createContext<OnboardingContextValue | null>(null);

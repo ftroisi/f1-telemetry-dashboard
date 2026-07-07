@@ -7,6 +7,8 @@ import {
   getPitData,
   getLocationData,
   getSessionDataExists,
+  getImportedEvents,
+  getEventInfoBySession,
 } from "../db/queries";
 import {
   getFormat,
@@ -19,6 +21,35 @@ import {
 } from "../proto/serializer";
 
 const router: import("express").Router = Router();
+
+
+// GET /sessions/imported-events - List events that have been imported into the DB
+router.get("/imported-events", async (req: Request, res: Response) => {
+  try {
+    const events = await getImportedEvents();
+    res.json(events);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch imported events", message: err.message });
+  }
+});
+
+// GET /sessions/:sessionKey/event-info - Get meeting/event info for a session
+router.get("/:sessionKey/event-info", async (req: Request, res: Response) => {
+  try {
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
+    const info = await getEventInfoBySession(sessionKey);
+    if (!info) {
+      return res.status(404).json({ error: "Event info not found for session" });
+    }
+    res.json(info);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch event info", message: err.message });
+  }
+});
 
 // GET /sessions/:sessionKey/drivers
 router.get("/:sessionKey/drivers", async (req: Request, res: Response) => {
@@ -138,5 +169,6 @@ router.get("/:sessionKey/location", async (req: Request, res: Response) => {
       .json({ error: "Failed to fetch location data", message: err.message });
   }
 });
+
 
 export default router;

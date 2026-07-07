@@ -39,3 +39,17 @@ export type Session = {
   date_end: string;
   year?: number;
 };
+
+export type ImportedEvent = {
+  meeting_key: number;
+  meeting_name: string;
+  country_name: string;
+  circuit_short_name: string;
+  location: string;
+  year: number;
+  meeting_date_start: string;
+  session_key: number;
+  session_name: string;
+  session_type: string;
+  session_date_start: string;
+};
