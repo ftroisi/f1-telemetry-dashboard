@@ -9,6 +9,7 @@ import {
   getSessionDataExists,
   getImportedEvents,
   getEventInfoBySession,
+  deleteSessionData,
 } from "../db/queries";
 import {
   getFormat,
@@ -167,6 +168,20 @@ router.get("/:sessionKey/location", async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ error: "Failed to fetch location data", message: err.message });
+  }
+});
+
+
+// DELETE /sessions/:sessionKey - Delete all data for a session
+router.delete("/:sessionKey", async (req: Request, res: Response) => {
+  try {
+    const sessionKey = parseInt(String(req.params.sessionKey), 10);
+    await deleteSessionData(sessionKey);
+    res.json({ success: true, session_key: sessionKey });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: "Failed to delete session", message: err.message });
   }
 });
 

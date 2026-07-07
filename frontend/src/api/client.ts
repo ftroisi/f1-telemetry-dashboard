@@ -184,3 +184,8 @@ export async function getImportedEvents(): Promise<ImportedEvent[]> {
 export async function getEventInfoBySession(sessionKey: number): Promise<EventInfo> {
   return apiGet(`/sessions/${sessionKey}/event-info`);
 }
+
+export async function deleteSession(sessionKey: number): Promise<{ success: boolean; session_key: number }> {
+  const res = await apiClient.delete(`/sessions/${sessionKey}`);
+  return res.data;
+}

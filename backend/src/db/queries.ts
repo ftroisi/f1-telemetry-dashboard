@@ -445,3 +445,31 @@ export async function getLatestImportStatus() {
   );
   return res.rows[0] || null;
 }
+
+
+// --- Delete Session ---
+export async function deleteSessionData(sessionKey: number) {
+  // Delete from child tables first, then the session, and finally the meeting if orphaned
+  await query("DELETE FROM drivers WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM laps WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM car_data WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM positions WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM pit WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM race_control WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM location WHERE session_key = $1", [sessionKey]);
+  await query("DELETE FROM import_status WHERE session_key = $1", [sessionKey]);
+
+  // Get meeting key before deleting the session
+  const sessionRes = await query("SELECT meeting_key FROM sessions WHERE session_key = $1", [sessionKey]);
+  const meetingKey = sessionRes.rows[0]?.meeting_key;
+
+  await query("DELETE FROM sessions WHERE session_key = $1", [sessionKey]);
+
+  // Remove meeting if it no longer has any sessions
+  if (meetingKey) {
+    const remaining = await query("SELECT COUNT(*) as count FROM sessions WHERE meeting_key = $1", [meetingKey]);
+    if (parseInt(remaining.rows[0].count, 10) === 0) {
+      await query("DELETE FROM meetings WHERE meeting_key = $1", [meetingKey]);
+    }
+  }
+}

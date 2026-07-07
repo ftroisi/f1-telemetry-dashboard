@@ -6,7 +6,8 @@ import {
   getImportStatus,
   checkSessionDataExists,
   getImportedEvents,
-  getEventInfoBySession
+  getEventInfoBySession,
+  deleteSession
 } from "../../api/client";
 import { toast } from "react-toastify";
 import { ImportProgress, Meeting, Session, ImportedEvent } from "../../types/onboardingTypes";
@@ -42,6 +43,8 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
   const [importing, setImporting] = useState(false);
   const [importedEvents, setImportedEvents] = useState<ImportedEvent[]>([]);
   const [loadingImportedEvents, setLoadingImportedEvents] = useState(false);
+  const [selectedImportedEvent, setSelectedImportedEvent] = useState<ImportedEvent | null>(null);
+  const [deletingSession, setDeletingSession] = useState(false);
 
   // Fetch meetings when year changes
   useEffect(() => {
@@ -213,18 +216,37 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     }
   };
 
-  const handleSelectImportedSession = async (sessionKey: number) => {
+  const handleLoadSession = async () => {
+    if (!selectedImportedEvent) return;
     try {
-      const info = await getEventInfoBySession(sessionKey);
+      const info = await getEventInfoBySession(selectedImportedEvent.session_key);
       if (info) {
         const meetingName = `${info.meeting_name || info.country_name} — ${info.circuit_short_name || info.location || ""}`;
-        onSelectSession(sessionKey, meetingName, info.session_name, info.session_date_start);
+        onSelectSession(selectedImportedEvent.session_key, meetingName, info.session_name, info.session_date_start);
       } else {
-        onSelectSession(sessionKey);
+        onSelectSession(selectedImportedEvent.session_key);
       }
     } catch (err: any) {
       console.error("Error fetching event info:", err);
-      onSelectSession(sessionKey);
+      onSelectSession(selectedImportedEvent.session_key);
+    }
+  };
+
+  const handleDeleteSession = async () => {
+    if (!selectedImportedEvent) return;
+    setDeletingSession(true);
+    try {
+      await deleteSession(selectedImportedEvent.session_key);
+      toast.success("Session deleted");
+      setSelectedImportedEvent(null);
+      // Refresh the imported events list
+      const events = await getImportedEvents();
+      setImportedEvents(events || []);
+    } catch (err: any) {
+      console.error("Error deleting session:", err);
+      toast.error(err.message || "Failed to delete session");
+    } finally {
+      setDeletingSession(false);
     }
   };
 
@@ -244,6 +266,11 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     importing,
     importedEvents,
     loadingImportedEvents,
+    selectedImportedEvent,
+    setSelectedImportedEvent,
+    handleLoadSession,
+    handleDeleteSession,
+    deletingSession,
     setSelectedMeeting,
     setSelectedSession,
     setYear,
@@ -251,7 +278,6 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
     setHideFutureEvents,
     handleImport,
     onSelectSession,
-    onSelectImportedSession: handleSelectImportedSession
   };
 
   return (

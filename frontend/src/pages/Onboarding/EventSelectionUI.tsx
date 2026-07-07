@@ -29,14 +29,18 @@ const EventSelectionUI = () => {
     loadingSessions,
     importedEvents,
     loadingImportedEvents,
+    selectedImportedEvent,
+    setSelectedImportedEvent,
+    handleLoadSession,
+    handleDeleteSession,
+    deletingSession,
     setSelectedMeeting,
     setSelectedSession,
     setYear,
     setHidePreSeason,
     setHideFutureEvents,
     handleImport,
-    onSelectSession,
-    onSelectImportedSession
+    onSelectSession
   } = useOnboardingContext();
 
   const years = [2023, 2024, 2025, 2026] as const;
@@ -72,10 +76,9 @@ const EventSelectionUI = () => {
           <Box className="mb-4 flex justify-center">
             <Autocomplete
               className="w-125 max-w-full"
+              value={selectedImportedEvent}
               onChange={(_, newVal) => {
-                if (newVal) {
-                  onSelectImportedSession(newVal.session_key);
-                }
+                setSelectedImportedEvent(newVal);
               }}
               options={importedEvents}
               loading={loadingImportedEvents}
@@ -110,6 +113,26 @@ const EventSelectionUI = () => {
               }}
               noOptionsText="No previously imported sessions"
             />
+          </Box>
+
+          {/* Load / Delete buttons */}
+          <Box className="mb-6 flex justify-center gap-3">
+            <Button
+              variant="contained"
+              disabled={!selectedImportedEvent}
+              onClick={handleLoadSession}
+              className="bg-racing-red-600 hover:bg-racing-red-500 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+            >
+              Load session
+            </Button>
+            <Button
+              variant="outlined"
+              disabled={!selectedImportedEvent || deletingSession}
+              onClick={handleDeleteSession}
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-800 px-5 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:border-red-600 hover:text-red-300 disabled:opacity-50"
+            >
+              {deletingSession ? "Deleting..." : "Delete session"}
+            </Button>
           </Box>
 
           {/* Divider with "or" */}

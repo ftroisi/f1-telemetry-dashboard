@@ -29,7 +29,11 @@ export interface OnboardingContextValue {
   ) => void;
   importedEvents: ImportedEvent[];
   loadingImportedEvents: boolean;
-  onSelectImportedSession: (sessionKey: number) => void;
+  selectedImportedEvent: ImportedEvent | null;
+  setSelectedImportedEvent: (event: ImportedEvent | null) => void;
+  handleLoadSession: () => void;
+  handleDeleteSession: () => void;
+  deletingSession: boolean;
 }
 
 export const OnboardingContext = createContext<OnboardingContextValue | null>(null);
