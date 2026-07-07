@@ -110,7 +110,9 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
                       size="small"
                       {...itemProps}
                       sx={{
-                        backgroundColor: option.team_colour ? `#${option.team_colour}33` : undefined,
+                        backgroundColor: option.team_colour
+                          ? `#${option.team_colour}33`
+                          : undefined,
                         color: option.team_colour ? `#${option.team_colour}` : undefined,
                         border: option.team_colour ? `1px solid #${option.team_colour}` : undefined
                       }}
@@ -126,7 +128,7 @@ const WidgetConfigPanel = ({ widget, drivers, onUpdate, onClose }: WidgetConfigP
                 return (
                   <Box component="li" key={option.driver_number} {...rest}>
                     <Box
-                      className="mr-2 h-3 w-3 rounded-full shrink-0"
+                      className="mr-2 h-3 w-3 shrink-0 rounded-full"
                       style={{
                         backgroundColor: option.team_colour ? `#${option.team_colour}` : "#888"
                       }}

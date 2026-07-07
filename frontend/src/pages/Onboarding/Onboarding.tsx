@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { getMeetings, getSessions, triggerImport, getImportStatus, checkSessionDataExists, getImportedEvents, getEventInfoBySession } from "../../api/client";
+import {
+  getMeetings,
+  getSessions,
+  triggerImport,
+  getImportStatus,
+  checkSessionDataExists,
+  getImportedEvents,
+  getEventInfoBySession
+} from "../../api/client";
 import { toast } from "react-toastify";
 import { ImportProgress, Meeting, Session, ImportedEvent } from "../../types/onboardingTypes";
 import { OnboardingContext } from "./OnboardingContext";
@@ -9,7 +17,12 @@ import Box from "node_modules/@mui/material/Box/index.mjs";
 
 interface OnboardingProps {
   onImportComplete: (sessionKey: number) => void;
-  onSelectSession: (sessionKey: number, meetingName?: string, sessionName?: string, date?: string) => void;
+  onSelectSession: (
+    sessionKey: number,
+    meetingName?: string,
+    sessionName?: string,
+    date?: string
+  ) => void;
   existingSessionKey: number | null;
 }
 
@@ -74,9 +87,10 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       }
     }
     fetchImported();
-    return () => { cancelled = true; };
-  }, [importing]);  // Re-fetch when import finishes
-
+    return () => {
+      cancelled = true;
+    };
+  }, [importing]); // Re-fetch when import finishes
 
   // Apply filters whenever meetings, hidePreSeason, or hideFutureEvents change
   useEffect(() => {
@@ -141,7 +155,9 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       }
     }
     checkData();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [selectedSession]);
 
   // Poll import progress
@@ -151,9 +167,9 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
       try {
         const progress = await getImportStatus(selectedSession);
         setImportProgress(progress);
-       if (progress.status === "complete") {
-         setImporting(false);
-         toast.success("Import complete!");
+        if (progress.status === "complete") {
+          setImporting(false);
+          toast.success("Import complete!");
           // Store event info
           const s = sessions.find((s) => s.session_key === selectedSession);
           const m = selectedMeeting;
@@ -240,7 +256,7 @@ const Onboarding = ({ onImportComplete, onSelectSession }: OnboardingProps) => {
 
   return (
     <OnboardingContext.Provider value={contextValue}>
-      <Box className="flex h-full w-full flex-col items-center justify-center mt-4">
+      <Box className="mt-4 flex h-full w-full flex-col items-center justify-center">
         {importing && importProgress ? <DataImportUI /> : <EventSelectionUI />}
       </Box>
     </OnboardingContext.Provider>

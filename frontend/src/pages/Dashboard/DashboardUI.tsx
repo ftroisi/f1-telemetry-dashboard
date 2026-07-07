@@ -59,8 +59,10 @@ const AddWidgetModal = ({
           ))}
         </List>
       </DialogContent>
-      <DialogActions className="!bg-[#161b22] !border-t !border-gray-800">
-        <Button onClick={onClose} className="!text-gray-400">Cancel</Button>
+      <DialogActions className="!border-t !border-gray-800 !bg-[#161b22]">
+        <Button onClick={onClose} className="!text-gray-400">
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -140,7 +142,7 @@ const DashboardUI = () => {
   }
 
   return (
-    <Box className="w-full flex flex-col">
+    <Box className="flex w-full flex-col">
       {/* Event Info Bar */}
       <EventInfoBarUI setShowAddWidgetModal={setShowAddWidgetModal} />
 
@@ -213,8 +215,10 @@ const DashboardUI = () => {
                       </button>
                     </Box>
                   </Box>
-                  <Suspense fallback={<CircularProgress className="m-auto mt-12" color="inherit" />}>
-                  <Box className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</Box>
+                  <Suspense
+                    fallback={<CircularProgress className="m-auto mt-12" color="inherit" />}
+                  >
+                    <Box className="h-[calc(100%-44px)] p-3">{renderWidget(widget)}</Box>
                   </Suspense>
                 </Box>
               ))}

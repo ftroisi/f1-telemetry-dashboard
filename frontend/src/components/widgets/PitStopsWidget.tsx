@@ -111,7 +111,18 @@ const PitStopsWidget = ({ sessionKey, driverNumbers }: PitStopsWidgetProps) => {
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }} layout="vertical">
         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-        <XAxis type="number" tick={{ fill: "#999", fontSize: 10 }} stroke="#555" label={{ value: "Duration (s)", position: "insideBottom", fill: "#999", fontSize: 10, offset: -5 }} />
+        <XAxis
+          type="number"
+          tick={{ fill: "#999", fontSize: 10 }}
+          stroke="#555"
+          label={{
+            value: "Duration (s)",
+            position: "insideBottom",
+            fill: "#999",
+            fontSize: 10,
+            offset: -5
+          }}
+        />
         <YAxis
           dataKey="name"
           type="category"

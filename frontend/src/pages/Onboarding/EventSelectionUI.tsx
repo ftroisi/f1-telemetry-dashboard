@@ -61,7 +61,6 @@ const EventSelectionUI = () => {
           telemetry dashboard.
         </Typography>
       </Box>
-
       {/* "Load a session" section - only show if there are imported events */}
       {importedEvents.length > 0 && (
         <>
@@ -85,7 +84,11 @@ const EventSelectionUI = () => {
               }
               isOptionEqualToValue={(a, b) => a.session_key === b.session_key}
               renderInput={(params) => (
-                <TextField {...params} label="Session" placeholder="Search previously imported sessions..." />
+                <TextField
+                  {...params}
+                  label="Session"
+                  placeholder="Search previously imported sessions..."
+                />
               )}
               renderOption={(props, option) => {
                 const { key, ...rest } = props;
@@ -96,7 +99,10 @@ const EventSelectionUI = () => {
                         {option.meeting_name || option.country_name}
                       </Typography>
                       <Typography className="!text-xs !text-gray-500">
-                        {option.session_name} {option.session_date_start ? `• ${new Date(option.session_date_start).toLocaleDateString()}` : ""}
+                        {option.session_name}{" "}
+                        {option.session_date_start
+                          ? `• ${new Date(option.session_date_start).toLocaleDateString()}`
+                          : ""}
                       </Typography>
                     </Box>
                   </Box>
@@ -114,11 +120,9 @@ const EventSelectionUI = () => {
           </Box>
         </>
       )}
-
       <Box className="mb-6 text-center">
-            <Typography className="mb-1 !text-xl !font-semibold">Import a session</Typography>
-          </Box>
-
+        <Typography className="mb-1 !text-xl !font-semibold">Import a session</Typography>
+      </Box>
       {/* Filters row */}
       <Box className="mb-4 flex flex-col flex-wrap items-center justify-center gap-4">
         <FormControl className="w-40">
@@ -138,31 +142,30 @@ const EventSelectionUI = () => {
           </Select>
         </FormControl>
         <Box className="flex flex-row items-center gap-1">
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={hidePreSeason}
-              onChange={(e) => setHidePreSeason(e.target.checked)}
-              className="!text-racing-red-500"
-              size="small"
-            />
-          }
-          label={<span className="text-sm text-gray-300">Hide pre-season testing</span>}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={hideFutureEvents}
-              onChange={(e) => setHideFutureEvents(e.target.checked)}
-              className="!text-racing-red-500"
-              size="small"
-            />
-          }
-          label={<span className="text-sm text-gray-300">Hide future events</span>}
-        />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={hidePreSeason}
+                onChange={(e) => setHidePreSeason(e.target.checked)}
+                className="!text-racing-red-500"
+                size="small"
+              />
+            }
+            label={<span className="text-sm text-gray-300">Hide pre-season testing</span>}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={hideFutureEvents}
+                onChange={(e) => setHideFutureEvents(e.target.checked)}
+                className="!text-racing-red-500"
+                size="small"
+              />
+            }
+            label={<span className="text-sm text-gray-300">Hide future events</span>}
+          />
         </Box>
       </Box>
-
       {/* GrandPrix Autocomplete */}
       <Box className="mb-4 flex justify-center">
         <Autocomplete
@@ -187,7 +190,8 @@ const EventSelectionUI = () => {
                     {option.meeting_name || option.country_name}
                   </Typography>
                   <Typography className="!text-xs !text-gray-500">
-                    {option.country_name || option.meeting_name} - {option.circuit_short_name || option.location}
+                    {option.country_name || option.meeting_name} -{" "}
+                    {option.circuit_short_name || option.location}
                   </Typography>
                 </Box>
               </Box>
@@ -196,7 +200,6 @@ const EventSelectionUI = () => {
           noOptionsText="No Grands Prix found"
         />
       </Box>
-
       {/* Sessions dropdown */}
       <Box className="mb-4 flex justify-center">
         <FormControl className="w-125 max-w-full">
@@ -248,7 +251,6 @@ const EventSelectionUI = () => {
           </Select>
         </FormControl>
       </Box>
-
       {/* Action Buttons — vary based on whether session data already exists */}
       <Box className="mt-5 flex justify-center gap-3">
         {sessionDataExists ? (
@@ -261,18 +263,20 @@ const EventSelectionUI = () => {
             >
               Re-Import Data
             </Button>
-           <Button
-             variant="outlined"
-             disabled={!selectedSession}
+            <Button
+              variant="outlined"
+              disabled={!selectedSession}
               onClick={() => {
                 const s = sessions.find((s) => s.session_key === selectedSession);
                 const m = selectedMeeting;
-                const meetingName = m ? `${m.meeting_name || m.country_name} — ${m.circuit_short_name || m.location || ""}` : undefined;
+                const meetingName = m
+                  ? `${m.meeting_name || m.country_name} — ${m.circuit_short_name || m.location || ""}`
+                  : undefined;
                 const sessionName = s?.session_name;
                 const date = s?.date_start;
                 onSelectSession(selectedSession!, meetingName, sessionName, date);
               }}
-             className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-500 disabled:opacity-50"
             >
               Browse <ChevronRight className="h-4 w-4" />
             </Button>
@@ -287,7 +291,8 @@ const EventSelectionUI = () => {
             Import Data
           </Button>
         )}
-      </Box>    </Box>
+      </Box>{" "}
+    </Box>
   );
 };
 

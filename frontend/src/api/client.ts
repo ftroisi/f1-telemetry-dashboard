@@ -131,7 +131,9 @@ export async function getLocationData(sessionKey: number, driverNumber?: number)
   return apiGet(`/sessions/${sessionKey}/location${params}`);
 }
 
-export async function checkSessionDataExists(sessionKey: number): Promise<{ exists: boolean; session_key: number }> {
+export async function checkSessionDataExists(
+  sessionKey: number
+): Promise<{ exists: boolean; session_key: number }> {
   return apiGet(`/sessions/${sessionKey}/exists`);
 }
 
@@ -146,7 +148,6 @@ export async function getImportStatus(sessionKey?: number): Promise<ImportProgre
   const params = sessionKey ? `?session_key=${sessionKey}` : "";
   return apiGet(`/import/status${params}`);
 }
-
 
 export type ImportedEvent = {
   meeting_key: number;

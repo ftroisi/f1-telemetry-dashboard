@@ -58,19 +58,21 @@ const Dashboard = ({ sessionKey, onBackToHome }: DashboardProps) => {
     }
     // If sessionStorage doesn't have event info, fetch from API
     if (!sessionStorage.getItem("active-meeting-name")) {
-      getEventInfoBySession(sessionKey).then(info => {
-        if (info) {
-          const meetingName = `${info.meeting_name || info.country_name} — ${info.circuit_short_name || info.location || ""}`;
-          setEventInfo({
-            meetingName,
-            sessionName: info.session_name || "",
-            sessionDate: info.session_date_start || ""
-          });
-          sessionStorage.setItem("active-meeting-name", meetingName);
-          sessionStorage.setItem("active-session-name", info.session_name || "");
-          sessionStorage.setItem("active-session-date", info.session_date_start || "");
-        }
-      }).catch(err => console.error("Failed to fetch event info:", err));
+      getEventInfoBySession(sessionKey)
+        .then((info) => {
+          if (info) {
+            const meetingName = `${info.meeting_name || info.country_name} — ${info.circuit_short_name || info.location || ""}`;
+            setEventInfo({
+              meetingName,
+              sessionName: info.session_name || "",
+              sessionDate: info.session_date_start || ""
+            });
+            sessionStorage.setItem("active-meeting-name", meetingName);
+            sessionStorage.setItem("active-session-name", info.session_name || "");
+            sessionStorage.setItem("active-session-date", info.session_date_start || "");
+          }
+        })
+        .catch((err) => console.error("Failed to fetch event info:", err));
     }
     loadDrivers();
   }, [sessionKey]);

@@ -6,7 +6,7 @@ export default defineConfig({
   root: process.cwd(),
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
-    "process.env.DRAGGABLE_DEBUG": "false",
+    "process.env.DRAGGABLE_DEBUG": "false"
   },
   resolve: {
     tsconfigPaths: true

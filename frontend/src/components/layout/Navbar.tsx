@@ -8,7 +8,7 @@ const Navbar = () => {
   return (
     <Box
       component="header"
-      className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] bg-site-bg-dark px-6 py-3"
+      className="bg-site-bg-dark flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] px-6 py-3"
     >
       <Box className="flex items-center gap-3">
         <img src={f1_logo} alt="F1 Logo" className="h-8 w-auto" />

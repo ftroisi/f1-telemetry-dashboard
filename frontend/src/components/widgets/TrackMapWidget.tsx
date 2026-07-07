@@ -113,7 +113,9 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
   if (scatterData.length === 0) {
     return (
       <Box className="flex h-full items-center justify-center">
-        <Typography className="!text-sm !text-gray-500">No track position data available</Typography>
+        <Typography className="!text-sm !text-gray-500">
+          No track position data available
+        </Typography>
       </Box>
     );
   }
@@ -127,14 +129,27 @@ const TrackMapWidget = ({ sessionKey, driverNumbers }: TrackMapWidgetProps) => {
           type="number"
           tick={{ fill: "#999", fontSize: 10 }}
           stroke="#555"
-          label={{ value: "X (m)", position: "insideBottom", fill: "#999", fontSize: 10, offset: -5 }}
+          label={{
+            value: "X (m)",
+            position: "insideBottom",
+            fill: "#999",
+            fontSize: 10,
+            offset: -5
+          }}
         />
         <YAxis
           dataKey="y"
           type="number"
           tick={{ fill: "#999", fontSize: 10 }}
           stroke="#555"
-          label={{ value: "Y (m)", angle: -90, position: "insideLeft", fill: "#999", fontSize: 10, offset: 5 }}
+          label={{
+            value: "Y (m)",
+            angle: -90,
+            position: "insideLeft",
+            fill: "#999",
+            fontSize: 10,
+            offset: 5
+          }}
         />
         <Tooltip
           contentStyle={{

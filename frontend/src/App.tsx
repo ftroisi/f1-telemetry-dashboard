@@ -21,7 +21,7 @@ const f1Theme = createTheme({
     secondary: { main: "#1ca7e3" },
     background: { default: "#0f1115", paper: "#161b22" },
     text: { primary: "#ffffff", secondary: "#9ca3af" },
-    divider: "rgba(255,255,255,0.08)",
+    divider: "rgba(255,255,255,0.08)"
   }
 });
 
@@ -53,13 +53,16 @@ function App() {
     sessionStorage.setItem("active-session-key", String(sKey));
   }, []);
 
-  const handleSelectSession = useCallback((sKey: number, meetingName?: string, sessionName?: string, date?: string) => {
-    setSessionKey(sKey);
-    sessionStorage.setItem("active-session-key", String(sKey));
-    if (meetingName) sessionStorage.setItem("active-meeting-name", meetingName);
-    if (sessionName) sessionStorage.setItem("active-session-name", sessionName);
-    if (date) sessionStorage.setItem("active-session-date", date);
-  }, []);
+  const handleSelectSession = useCallback(
+    (sKey: number, meetingName?: string, sessionName?: string, date?: string) => {
+      setSessionKey(sKey);
+      sessionStorage.setItem("active-session-key", String(sKey));
+      if (meetingName) sessionStorage.setItem("active-meeting-name", meetingName);
+      if (sessionName) sessionStorage.setItem("active-session-name", sessionName);
+      if (date) sessionStorage.setItem("active-session-date", date);
+    },
+    []
+  );
 
   const handleBackToHome = useCallback(() => {
     setSessionKey(null);
@@ -71,7 +74,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-site-bg-dark">
+      <div className="bg-site-bg-dark flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="border-racing-red-500 mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
           <p className="text-midnight-violet-200">Connecting to server...</p>
@@ -95,7 +98,7 @@ function App() {
             pauseOnHover
             theme="dark"
           />
-          <Box className="flex min-h-screen flex-col bg-site-bg-dark">
+          <Box className="bg-site-bg-dark flex min-h-screen flex-col">
             <Navbar />
             <Box className="flex-1">
               {!isDashboardView ? (

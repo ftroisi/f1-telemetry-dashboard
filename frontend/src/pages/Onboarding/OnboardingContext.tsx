@@ -21,7 +21,12 @@ export interface OnboardingContextValue {
   setHidePreSeason: (hide: boolean) => void;
   setHideFutureEvents: (hide: boolean) => void;
   handleImport: () => void;
-  onSelectSession: (sessionKey: number, meetingName?: string, sessionName?: string, date?: string) => void;
+  onSelectSession: (
+    sessionKey: number,
+    meetingName?: string,
+    sessionName?: string,
+    date?: string
+  ) => void;
   importedEvents: ImportedEvent[];
   loadingImportedEvents: boolean;
   onSelectImportedSession: (sessionKey: number) => void;

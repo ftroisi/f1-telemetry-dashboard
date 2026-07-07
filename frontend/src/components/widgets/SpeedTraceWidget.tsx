@@ -54,7 +54,10 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
   // Load laps for the first selected driver
   useEffect(() => {
     async function loadLaps() {
-      if (selectedDriverNumbers.length === 0) { setLaps([]); return; }
+      if (selectedDriverNumbers.length === 0) {
+        setLaps([]);
+        return;
+      }
       try {
         const l = await getLaps(sessionKey, selectedDriverNumbers[0]);
         setLaps(l || []);
@@ -161,12 +164,12 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
   return (
     <Box className="flex h-full flex-col">
       {/* Controls row */}
-      <Box className="w-full mb-2 flex flex-row items-center gap-2">
+      <Box className="mb-2 flex w-full flex-row items-center gap-2">
         {/* Driver selector - Autocomplete with Chips */}
         <Autocomplete
           multiple
           size="small"
-          className="min-w-45 w-1/2"
+          className="w-1/2 min-w-45"
           value={allDrivers.filter((d) => selectedDriverNumbers.includes(d.driver_number))}
           onChange={(_, newVal) => setSelectedDriverNumbers(newVal.map((d) => d.driver_number))}
           options={allDrivers}
@@ -175,13 +178,7 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
           renderValue={(value, getItemProps) =>
             (value as Driver[]).map((option, index) => {
               const itemProps = getItemProps({ index });
-              return (
-                <Chip
-                  label={option.name_acronym}
-                  size="small"
-                  {...itemProps}
-                />
-              );
+              return <Chip label={option.name_acronym} size="small" {...itemProps} />;
             })
           }
           renderInput={(params) => (
@@ -190,7 +187,7 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
         />
 
         {/* Lap selector */}
-        <FormControl size="small" className="min-w-30 w-1/2">
+        <FormControl size="small" className="w-1/2 min-w-30">
           <InputLabel>Lap</InputLabel>
           <Select
             value={selectedLapNumber ?? ""}
@@ -218,7 +215,7 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
       )}
 
       {/* Chart */}
-      <Box className="flex-1 min-h-0">
+      <Box className="min-h-0 flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
@@ -230,13 +227,26 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
                 return `${d.getSeconds()}.${String(d.getMilliseconds()).slice(0, 2)}s`;
               }}
               stroke="#555"
-              label={{ value: "Time (s)", position: "insideBottom", fill: "#999", fontSize: 10, offset: -5 }}
+              label={{
+                value: "Time (s)",
+                position: "insideBottom",
+                fill: "#999",
+                fontSize: 10,
+                offset: -5
+              }}
             />
             <YAxis
               yAxisId="speed"
               tick={{ fill: "#999", fontSize: 10 }}
               stroke="#1ca7e3"
-              label={{ value: "Speed (km/h)", angle: -90, position: "insideLeft", fill: "#1ca7e3", fontSize: 10, offset: 5 }}
+              label={{
+                value: "Speed (km/h)",
+                angle: -90,
+                position: "insideLeft",
+                fill: "#1ca7e3",
+                fontSize: 10,
+                offset: 5
+              }}
             />
             <YAxis
               yAxisId="pedals"
@@ -244,7 +254,14 @@ const SpeedTraceWidget = ({ sessionKey, driverNumbers, lapNumber }: SpeedTraceWi
               tick={{ fill: "#999", fontSize: 10 }}
               stroke="#fbce04"
               domain={[0, 100]}
-              label={{ value: "Pedal (%)", angle: 90, position: "insideRight", fill: "#fbce04", fontSize: 10, offset: 5 }}
+              label={{
+                value: "Pedal (%)",
+                angle: 90,
+                position: "insideRight",
+                fill: "#fbce04",
+                fontSize: 10,
+                offset: 5
+              }}
             />
             <Tooltip
               contentStyle={{
