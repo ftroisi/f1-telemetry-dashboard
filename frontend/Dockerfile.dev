@@ -12,6 +12,7 @@ COPY ./postcss.config.js ./
 COPY ./index.html ./
 COPY ./pnpm-workspace.yaml ./
 COPY ./assets ./assets
+COPY ./public ./public
 
 RUN pnpm install
 

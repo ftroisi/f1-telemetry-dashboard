@@ -16,6 +16,7 @@ RUN pnpm install
 
 COPY frontend/src/ ./src/
 COPY frontend/assets ./assets
+COPY frontend/public ./public
 
 RUN pnpm run build
 
