@@ -14,11 +14,11 @@ A fully containerized, three-tier application for visualizing Formula 1 telemetr
 │   Material UI 9      │     │   OpenF1 Client       │     │                      │
 │   Port 3000          │     │   Port 4000           │     │   Port 5432          │
 └──────────────────────┘     └─────────────────────-─┘     └──────────────────────┘
-         │                              │                              │
-         │                              │                              │
-         │              ┌───────────────┼───────────────┐              │
-         │              │   OpenF1 API (External)       │              │
-         └──────────────│   https://api.openf1.org/v1   │──────────────┘
+                                        │
+                                        │
+                        ┌───────────────┼───────────────┐
+                        │   OpenF1 API (External)       │
+                        │   https://api.openf1.org/v1   │
                         └───────────────────────────────┘
 ```
 
